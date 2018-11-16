@@ -1,29 +1,29 @@
-tiempo(1..30).
+time(1..30).
 
-rangoX(0..9).
-rangoY(0..9).
+rangeX(0..9).
+rangeY(0..9).
 
 %% Obstacles in map: 
-obstaculo(4,0).
-obstaculo(7,0).
-obstaculo(8,0).
-obstaculo(3,1).
-obstaculo(4,2).
-obstaculo(8,2).
-obstaculo(6,4).
-obstaculo(0,5).
-obstaculo(0,6).
-obstaculo(7,6).
-obstaculo(0,7).
-obstaculo(2,7).
-obstaculo(6,7).
-obstaculo(8,7).
-obstaculo(3,8).
-obstaculo(9,8).
-obstaculo(0,9).
-obstaculo(3,9).
-obstaculo(5,9).
-obstaculo(6,9).
+obstacle(4,0).
+obstacle(7,0).
+obstacle(8,0).
+obstacle(3,1).
+obstacle(4,2).
+obstacle(8,2).
+obstacle(6,4).
+obstacle(0,5).
+obstacle(0,6).
+obstacle(7,6).
+obstacle(0,7).
+obstacle(2,7).
+obstacle(6,7).
+obstacle(8,7).
+obstacle(3,8).
+obstacle(9,8).
+obstacle(0,9).
+obstacle(3,9).
+obstacle(5,9).
+obstacle(6,9).
 
 %% Agents: 
 robot(r1).
@@ -34,20 +34,20 @@ robot(r5).
 robot(r6).
 
 %% Initial positions:: 
-en(r1,9,3,0).
-en(r2,8,8,0).
-en(r3,7,2,0).
-en(r4,0,2,0).
-en(r5,1,1,0).
-en(r6,4,3,0).
+on(r1,9,3,0).
+on(r2,8,8,0).
+on(r3,7,2,0).
+on(r4,0,2,0).
+on(r5,1,1,0).
+on(r6,4,3,0).
 
 %% Goal positions: 
-objetivo(r1,0,1).
-objetivo(r2,3,4).
-objetivo(r3,4,5).
-objetivo(r4,3,3).
-objetivo(r5,8,3).
-objetivo(r6,2,9).
+goal(r1,0,1).
+goal(r2,3,4).
+goal(r3,4,5).
+goal(r4,3,3).
+goal(r5,8,3).
+goal(r6,2,9).
 
 %% Direction for each agent position: 
 best_action(r1,0,0,up).
@@ -773,11 +773,11 @@ best_action(r6,9,9,left).
 %% Grid world info: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-delta(right,X,Y,X+1,Y) :- rangoX(X), rangoY(Y).
-delta(left,X,Y,X-1,Y) :- rangoX(X), rangoY(Y).
-delta(up,X,Y,X,Y+1) :- rangoX(X), rangoY(Y).
-delta(down,X,Y,X,Y-1) :- rangoX(X), rangoY(Y).
-delta(wait,X,Y,X,Y) :- rangoX(X),rangoY(Y).
+delta(right,X,Y,X+1,Y) :- rangeX(X), rangeY(Y).
+delta(left,X,Y,X-1,Y) :- rangeX(X), rangeY(Y).
+delta(up,X,Y,X,Y+1) :- rangeX(X), rangeY(Y).
+delta(down,X,Y,X,Y-1) :- rangeX(X), rangeY(Y).
+delta(wait,X,Y,X,Y) :- rangeX(X),rangeY(Y).
 
 action(up).
 action(down).
@@ -785,32 +785,33 @@ action(left).
 action(right).
 action(wait).
 
-1 {exec(R,A,T-1) : action(A)} 1 :- robot(R),tiempo(T).
+1 {exec(R,A,T-1) : action(A)} 1 :- robot(R),time(T).
 
-en(R,X,Y,T) :- exec(R,A,T-1),en(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
+on(R,X,Y,T) :- exec(R,A,T-1),on(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
 
 
-penalty(R,T,1) :- exec(R,wait,T),en(R,X,Y,T),not best_action(R,X,Y,wait).
-penalty(R,T,2) :- exec(R,A,T),A!=wait,en(R,X,Y,T),not best_action(R,X,Y,A).
+penalty(R,T,1) :- exec(R,wait,T),on(R,X,Y,T),not best_action(R,X,Y,wait).
+penalty(R,T,2) :- exec(R,A,T),A!=wait,on(R,X,Y,T),not best_action(R,X,Y,A).
 
-:- en(R,X,Y,T), not rangoX(X).
-:- en(R,X,Y,T), not rangoY(Y).
-:- en(R1,X,Y,T),en(R2,X,Y,T),R1!=R2. % no hay dos robots en la misma posicion
-:- en(R,X,Y,T),obstaculo(X,Y). %no hay robots encima de obstaculos
- %:- en(R1,X1,Y1,T-1),en(R2,X2,Y2,T-1),en(R1,X2,Y2,T),en(R2,X1,Y1,T),R1!=R2. 
-:- en(R1,X1+1,Y1,T-1), en(R2,X1,Y1,T-1), en(R1,X1,Y1,T), en(R2,X1+1,Y1,T),R1!=R2.
-:- en(R1,X1,Y1+1,T-1), en(R2,X1,Y1,T-1), en(R1,X1,Y1,T), en(R2,X1,Y1+1,T),R1!=R2.
-%no hay 'swaps'
+:- on(R,X,Y,T), not rangeX(X).
+:- on(R,X,Y,T), not rangeY(Y).
+:- on(R1,X,Y,T),on(R2,X,Y,T),R1!=R2. % two robots can't be on the same position
+:- on(R,X,Y,T),obstacle(X,Y). % robots can't be on an obstacle
 
-final(T) :- tiempo(T), en(R,X,Y,T) : objetivo(R,X,Y).
-fin :- tiempo(T),final(T).
-:- not fin.
+% there's no swap movements
+:- on(R1,X1+1,Y1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1+1,Y1,T),R1!=R2.
+:- on(R1,X1,Y1+1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1,Y1+1,T),R1!=R2.
+
+
+final(T) :- time(T), on(R,X,Y,T) : goal(R,X,Y).
+end :- time(T),final(T).
+:- not end.
 
 #minimize {P,R,T : penalty(R,T,P)}.
 
 
-%#show objetivo/3.
-%#show obstaculo/2.
-%#show en/4.
+%#show goal/3.
+%#show obstacle/2.
+%#show on/4.
 #show final/1.
 %#show exec/3.

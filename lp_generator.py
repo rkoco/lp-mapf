@@ -153,18 +153,6 @@ class Problem:
                         #If the cost is the same, the new path is equivalent and also is a best move
                         self.best_dirs[ag_id][vy][vx].append(self.dir_name[i])
 
-        self.opt_sumtime = 0
-        self.opt_timestep = -1
-        for ag in range(self.num_agents):
-            posX = self.agents_pos[ag][0]
-            posY = self.agents_pos[ag][1]
-            best_time = self.heuristic[ag][posX][posY]
-            if (self.opt_timestep == -1 or best_time > self.opt_timestep):
-                self.opt_timestep = best_time
-
-            self.opt_sumtime += best_time
-
-
 
         # for y in range(self.height):
         #     line = ''
@@ -180,11 +168,27 @@ class Problem:
         #         line += ', {}{}'.format(dir1,dir2)
         #     print(line)
 
+    def calc_time(self):
+        self.opt_sumtime = 0
+        self.opt_timestep = -1
+        for ag in range(self.num_agents):
+            posX = self.agents_pos[ag][0]
+            posY = self.agents_pos[ag][1]
+            best_time = self.heuristic[ag][posX][posY]
+            if (self.opt_timestep == -1 or best_time > self.opt_timestep):
+                self.opt_timestep = best_time
+
+            self.opt_sumtime += best_time
+
+        print(self.opt_timestep)
+
+
 
     def write_to_lp(self, outp):
+
         with open('{0}{1}.lp'.format(outp, ''), 'w') as out_file:
             #Write the time:
-            out_file.write('tiempo(1..{0}).\n\n'.format(self.time))
+            out_file.write('time(1..{0}).\n\n'.format(self.time))
 
             #write the map
             out_file.write('rangeX(0..{0}).\n'.format(self.width-1))
@@ -303,8 +307,8 @@ class Problem:
 
 
 def generate_instances():
-    i = 0
-    for entry in os.scandir('problems/original/grid32/IJCAI'): 
+    '''
+    for entry in os.scandir('problems/original/grid10/'): 
         #print("Instance-10-20-6-{0}".format(i))
         #i+=1
         #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
@@ -316,9 +320,32 @@ def generate_instances():
             print(ag)
             problem.solve_agent(ag)
         
-        print('{0}'.format(problem.opt_timestep))
+        #print('{0}'.format(problem.opt_timestep))
 
-        problem.write_to_lp('Instances/Corridor3/{0}'.format(entry.name.split('.')[0]))
+        problem.write_to_lp('problems/asp/grid10/{0}'.format(entry.name.split('.')[0]))
+    '''
+    i = 0
+    for i in range(10):
+
+        inp = 'problems/original/grid32/small/32x32_20obs_1_10_{0}.agents'.format(i)
+        #i+=1
+        #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
+        problem = Problem(100)
+        #problem.read_instance(entry.path)
+        problem.read_map('problems/original/grid32/32x32_20obs.map')
+        problem.read_agents(inp)
+        for ag in range(problem.num_agents):
+            #print(ag)
+            problem.solve_agent(ag)
+        problem.calc_time()
+
+        #print('{0}'.format(problem.opt_timestep))
+        outp = 'problems/asp/grid32/small/32x32_20obs_1_10_{0}'.format(i)
+        
+        #print(outp)
+        #problem.write_to_lp('Instances/Corridor3/{0}'.format(inp.split('.')[0]))
+        problem.write_to_lp(outp)
+
         #problem.change_format('OriginalCorridor/Instances/{0}'.format(entry.name.split('.')[0]), entry.name.split('_')[2].split('.')[0])
 
 

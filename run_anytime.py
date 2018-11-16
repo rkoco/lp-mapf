@@ -20,11 +20,13 @@ def run(command):
         if 'Threads' in line:
             break
 
-        #print(line)
+        print(line)
 
     return solutions
 
 
 if __name__ == "__main__":
-    command = ".\clingo -t 4 --time-limit=300 Instances\Grid10_2\Instance-10-20-6-12.lp"
-    run(command)
+    for i in range(1):
+        command = 'clingo\clingo -t 4 --time-limit=300 problems/asp/grid32/IJCAI/32x32_20obs_1_60_{0}.lp'.format(i)
+        print(command)
+        print(run(command))
