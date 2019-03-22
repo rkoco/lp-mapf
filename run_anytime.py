@@ -27,6 +27,6 @@ def run(command):
 
 if __name__ == "__main__":
     for i in range(1):
-        command = 'clingo\clingo -t 4 --time-limit=300 problems/asp/grid32/IJCAI/32x32_20obs_1_60_{0}.lp'.format(i)
+        command = 'clingo\clingo -t 4 --time-limit=300 buffer.lp'
         print(command)
         print(run(command))

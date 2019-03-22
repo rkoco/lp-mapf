@@ -1,3 +1,4 @@
+%% Grid world info: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 delta(right,X,Y,X+1,Y) :- rangeX(X), rangeY(Y).
@@ -16,20 +17,14 @@ action(wait).
 
 on(R,X,Y,T) :- exec(R,A,T-1),on(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
 
-penalty(R,T,1) :- exec(R,wait,T),
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,wait).
-
-penalty(R,T,2) :- exec(R,A,T),
-                  A != wait,
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,A).
+cost(R,T,1) :- robot(R), tiempo(T), goal(R,X1,Y1), on(R,X2,Y2,T), X1!=X2.
+cost(R,T,1) :- robot(R), tiempo(T), goal(R,X1,Y1), on(R,X2,Y2,T), Y1!=Y2.
 
 
 :- on(R,X,Y,T), not rangeX(X).
 :- on(R,X,Y,T), not rangeY(Y).
 :- on(R1,X,Y,T),on(R2,X,Y,T),R1!=R2. % no hay dos robots en la misma posicion
-:- on(R,X,Y,T),obstacle(X,Y). %no hay robots encima de obstaculos
+:- on(R,X,Y,T),obstaculo(X,Y). %no hay robots encima de obstaculos
 :- on(R1,X1+1,Y1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1+1,Y1,T),R1!=R2.
 :- on(R1,X1,Y1+1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1,Y1+1,T),R1!=R2.
 
@@ -40,10 +35,10 @@ at_goal(R,T) :- robot(R),time(T), on(R,X,Y,T), goal(R,X,Y).
 %fin :- goal(T).
 %:- not fin.
 
-:- robot(R),not at_goal(R, max_t).
+:- robot(R), not at_goal(R,30).
 
 
-#minimize {P,R,T : penalty(R,T,P)}.
+#minimize {C,R,T : cost(R,T,C)}.
 
 
 #show on/4.

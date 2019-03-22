@@ -1,5 +1,6 @@
 import os
-
+import clingo
+import asp_solver
 
 class Problem:
     def __init__(self, time):
@@ -22,6 +23,14 @@ class Problem:
         self.instance_number = ''
         self.opt_sumtime = 0
         self.opt_timestep = -1
+
+        self.sol = []
+        self.max_time = -1
+        self.total_cost = 0
+        self.agent_cost = []
+        self.min_sum = 0
+
+        self.solved = False
 
 
     def read_instance(self, inp):
@@ -152,21 +161,8 @@ class Problem:
                     if v_cost == gv:
                         #If the cost is the same, the new path is equivalent and also is a best move
                         self.best_dirs[ag_id][vy][vx].append(self.dir_name[i])
+            
 
-
-        # for y in range(self.height):
-        #     line = ''
-        #     for x in range(self.width):
-        #         dir1 = 'w'
-        #         dir2 = 'w'
-        #         if len(self.best_dirs[ag_id][y][x]) == 2:
-        #             dir1 = self.best_dirs[ag_id][y][x][0]
-        #             dir2 = self.best_dirs[ag_id][y][x][1]
-
-        #         elif len(self.best_dirs[ag_id][y][x]) == 1:
-        #             dir1 = self.best_dirs[ag_id][y][x][0]
-        #         line += ', {}{}'.format(dir1,dir2)
-        #     print(line)
 
     def calc_time(self):
         self.opt_sumtime = 0
@@ -183,12 +179,64 @@ class Problem:
         print(self.opt_timestep)
 
 
+    def gen_solution(self):
+        self.sol = []
+        self.total_cost = 0
+        self.agent_cost = []
+        self.max_time = 0
+        self.min_sum = 0
+        for ag in range(self.num_agents):
+            self.solve_agent(ag)
+            self.agent_cost.append(0)
+
+        for ag in range(self.num_agents):
+            posY = self.agents_pos[ag][0]
+            posX = self.agents_pos[ag][1]
+            ag_sol = [(posX,posY)]
+
+            t = 0
+            while True:
+                best_dir = self.best_dirs[ag][posY][posX]
+                if len(best_dir) > 0:
+                    best_dir = best_dir[0]
+                else:
+                    print('????')
+                    print(ag,posY,posX,best_dir)
+
+                if best_dir == 'left':
+                    posX -= 1
+                elif best_dir == 'down':
+                    posY -= 1
+                elif best_dir == 'right':
+                    posX += 1
+                elif best_dir == 'up':
+                    posY +=1
+                elif best_dir == 'wait':
+                    if self.max_time < t:
+                        self.max_time = t
+                    break
+
+                self.total_cost += 1
+                self.agent_cost[ag] += 1
+
+                print((posX,posY))
+                ag_sol.append((posX,posY))
+                t+=1
+
+            self.sol.append(ag_sol)
+
+        self.min_sum = self.total_cost - self.max_time
+        print(self.sol)
+        print('----')
+        print(self.max_time)
+        self.solved = True
 
     def write_to_lp(self, outp):
-
         with open('{0}{1}.lp'.format(outp, ''), 'w') as out_file:
+            print(os.path.abspath(out_file.name))
             #Write the time:
-            out_file.write('time(1..{0}).\n\n'.format(self.time))
+            #out_file.write('#const max_t = {0}.\n'.format(self.time))
+            #out_file.write('time(1..max_t).\n\n')
 
             #write the map
             out_file.write('rangeX(0..{0}).\n'.format(self.width-1))
@@ -241,7 +289,7 @@ class Problem:
                 out_file.write('\n\n')
 
             #Base info for the grid world in lp
-            with open('base.lp', 'r') as base_file:
+            with open('baseF.lp', 'r') as base_file:
                 out_file.write('%% Grid world info: \n')
                 for line in base_file.readlines():
                     out_file.write(line)
@@ -304,6 +352,11 @@ class Problem:
         print(sol_cost)
 
 
+    def clingo_solve(self, inp):
+        solv = asp_solver.Application(inp, self.max_time, self.num_agents)
+        clingo.clingo_main(solv, [inp, '-t', '4'])
+        self.sol = solv.resp
+        self.sol_time = solv.sol_time
 
 
 def generate_instances():
@@ -323,30 +376,44 @@ def generate_instances():
         #print('{0}'.format(problem.opt_timestep))
 
         problem.write_to_lp('problems/asp/grid10/{0}'.format(entry.name.split('.')[0]))
-    '''
+    
+
+
+    
     i = 0
     for i in range(10):
 
-        inp = 'problems/original/grid32/small/32x32_20obs_1_10_{0}.agents'.format(i)
+        inp = 'problems/original/grid10_2/Instance-10-20-20-{0}'.format(i)
         #i+=1
         #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
-        problem = Problem(100)
-        #problem.read_instance(entry.path)
-        problem.read_map('problems/original/grid32/32x32_20obs.map')
-        problem.read_agents(inp)
+        problem = Problem(40)
+        problem.read_instance(inp)
+        #problem.read_map('problems/original/grid32/32x32_20obs.map')
+        #problem.read_agents(inp)
         for ag in range(problem.num_agents):
             #print(ag)
             problem.solve_agent(ag)
         problem.calc_time()
 
         #print('{0}'.format(problem.opt_timestep))
-        outp = 'problems/asp/grid32/small/32x32_20obs_1_10_{0}'.format(i)
+        outp = 'problems/asp/grid10_2/Instance-10-20-20-{0}'.format(i)
         
         #print(outp)
         #problem.write_to_lp('Instances/Corridor3/{0}'.format(inp.split('.')[0]))
         problem.write_to_lp(outp)
 
         #problem.change_format('OriginalCorridor/Instances/{0}'.format(entry.name.split('.')[0]), entry.name.split('_')[2].split('.')[0])
+        '''
+
+    inp = 'problems/original/grid10/Instance-10-20-6-49'
+    problem = Problem(30)
+    problem.read_instance(inp)
+    #for ag in range(problem.num_agents):
+    #    problem.solve_agent(ag)
+
+    outp = 'ins17'
+    problem.write_to_lp(outp)
+
 
 
 def main():

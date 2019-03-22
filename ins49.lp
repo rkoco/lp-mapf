@@ -1,3 +1,69 @@
+time(1..30).
+
+rangeX(0..9).
+rangeY(0..9).
+
+%% Obstacles in map: 
+obstacle(8,0).
+obstacle(5,1).
+obstacle(3,2).
+obstacle(9,3).
+obstacle(2,4).
+obstacle(6,4).
+obstacle(8,4).
+obstacle(0,5).
+obstacle(3,5).
+obstacle(6,5).
+obstacle(0,6).
+obstacle(1,6).
+obstacle(2,6).
+obstacle(0,7).
+obstacle(3,7).
+obstacle(9,8).
+obstacle(1,9).
+obstacle(2,9).
+obstacle(6,9).
+obstacle(7,9).
+
+%% Agents: 
+robot(r1).
+robot(r2).
+robot(r3).
+robot(r4).
+robot(r5).
+robot(r6).
+
+%% Initial positions:: 
+on(r1,3,1,0).
+on(r2,8,9,0).
+on(r3,6,0,0).
+on(r4,1,1,0).
+on(r5,4,8,0).
+on(r6,5,5,0).
+
+%% Goal positions: 
+goal(r1,8,3).
+goal(r2,2,8).
+goal(r3,6,1).
+goal(r4,0,9).
+goal(r5,4,8).
+goal(r6,3,0).
+
+%% Direction for each agent position: 
+
+
+
+
+
+
+
+
+
+
+
+
+%% Grid world info: 
+%% Grid world info: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 delta(right,X,Y,X+1,Y) :- rangeX(X), rangeY(Y).
@@ -16,15 +82,12 @@ action(wait).
 
 on(R,X,Y,T) :- exec(R,A,T-1),on(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
 
-penalty(R,T,1) :- exec(R,wait,T),
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,wait).
 
-penalty(R,T,2) :- exec(R,A,T),
-                  A != wait,
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,A).
+final_pos(R, 30) :- robot(R), at_goal(R, 30).
 
+final_pos(R, T) :- robot(R), time(T), at_goal(R, T), T < 30,  final_pos(R, T + 1).
+
+cost(R,T,1) :- robot(R), time(T), not final_pos(R, T).
 
 :- on(R,X,Y,T), not rangeX(X).
 :- on(R,X,Y,T), not rangeY(Y).
@@ -40,10 +103,10 @@ at_goal(R,T) :- robot(R),time(T), on(R,X,Y,T), goal(R,X,Y).
 %fin :- goal(T).
 %:- not fin.
 
-:- robot(R),not at_goal(R, max_t).
+:- robot(R), not at_goal(R,30).
 
 
-#minimize {P,R,T : penalty(R,T,P)}.
+#minimize {C,R,T : cost(R,T,C)}.
 
 
 #show on/4.
@@ -53,3 +116,9 @@ at_goal(R,T) :- robot(R),time(T), on(R,X,Y,T), goal(R,X,Y).
 %#show exec/3.
 #show rangeX/1.
 #show rangeY/1.
+
+
+
+
+
+

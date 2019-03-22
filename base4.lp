@@ -1,5 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 delta(right,X,Y,X+1,Y) :- rangeX(X), rangeY(Y).
 delta(left,X,Y,X-1,Y) :- rangeX(X), rangeY(Y).
 delta(up,X,Y,X,Y+1) :- rangeX(X), rangeY(Y).
@@ -16,15 +14,12 @@ action(wait).
 
 on(R,X,Y,T) :- exec(R,A,T-1),on(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
 
-penalty(R,T,1) :- exec(R,wait,T),
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,wait).
 
-penalty(R,T,2) :- exec(R,A,T),
-                  A != wait,
-                  on(R,X,Y,T),
-                  not best_action(R,X,Y,A).
+final_pos(R, 30) :- robot(R), at_goal(R, 30).
 
+final_pos(R, T) :- robot(R), time(T), at_goal(R, T), T < 30,  final_pos(R, T + 1).
+
+cost(R,T,1) :- robot(R), time(T), not final_pos(R, T).
 
 :- on(R,X,Y,T), not rangeX(X).
 :- on(R,X,Y,T), not rangeY(Y).
@@ -40,10 +35,10 @@ at_goal(R,T) :- robot(R),time(T), on(R,X,Y,T), goal(R,X,Y).
 %fin :- goal(T).
 %:- not fin.
 
-:- robot(R),not at_goal(R, max_t).
+:- robot(R), not at_goal(R,30).
 
 
-#minimize {P,R,T : penalty(R,T,P)}.
+#minimize {C,R,T : cost(R,T,C)}.
 
 
 #show on/4.
