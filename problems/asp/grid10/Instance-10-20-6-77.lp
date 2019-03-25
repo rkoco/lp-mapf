@@ -1,5 +1,3 @@
-time(1..30).
-
 rangeX(0..9).
 rangeY(0..9).
 
@@ -735,7 +733,11 @@ best_action(r6,9,9,down).
 
 
 %% Grid world info: 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+action(up).
+action(down).
+action(left).
+action(right).
+action(wait).
 
 delta(right,X,Y,X+1,Y) :- rangeX(X), rangeY(Y).
 delta(left,X,Y,X-1,Y) :- rangeX(X), rangeY(Y).
@@ -743,39 +745,52 @@ delta(up,X,Y,X,Y+1) :- rangeX(X), rangeY(Y).
 delta(down,X,Y,X,Y-1) :- rangeX(X), rangeY(Y).
 delta(wait,X,Y,X,Y) :- rangeX(X),rangeY(Y).
 
-action(up).
-action(down).
-action(left).
-action(right).
-action(wait).
-
-1 {exec(R,A,T-1) : action(A)} 1 :- robot(R),time(T).
-
-on(R,X,Y,T) :- exec(R,A,T-1),on(R,Xp,Yp,T-1),delta(A,Xp,Yp,X,Y).
+#program evolution(t).
+on(R,X,Y,t) :- exec(R,A,t-1),on(R,Xp,Yp,t-1),delta(A,Xp,Yp,X,Y).
+:- on(R1,X1+1,Y1,t-1), on(R2,X1,Y1,t-1), on(R1,X1,Y1,t), on(R2,X1+1,Y1,t),R1!=R2.
+:- on(R1,X1,Y1+1,t-1), on(R2,X1,Y1,t-1), on(R1,X1,Y1,t), on(R2,X1,Y1+1,t),R1!=R2.
 
 
-penalty(R,T,1) :- exec(R,wait,T),on(R,X,Y,T),not best_action(R,X,Y,wait).
-penalty(R,T,2) :- exec(R,A,T),A!=wait,on(R,X,Y,T),not best_action(R,X,Y,A).
+#program step(t).
+1 {exec(R,A,t) : action(A)} 1 :- robot(R).
 
-:- on(R,X,Y,T), not rangeX(X).
-:- on(R,X,Y,T), not rangeY(Y).
-:- on(R1,X,Y,T),on(R2,X,Y,T),R1!=R2. % two robots can't be on the same position
-:- on(R,X,Y,T),obstacle(X,Y). % robots can't be on an obstacle
+penalty(R,t,1) :- exec(R,wait,t),
+                  on(R,X,Y,t),
+                  not best_action(R,X,Y,wait).
 
-% there's no swap movements
-:- on(R1,X1+1,Y1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1+1,Y1,T),R1!=R2.
-:- on(R1,X1,Y1+1,T-1), on(R2,X1,Y1,T-1), on(R1,X1,Y1,T), on(R2,X1,Y1+1,T),R1!=R2.
+penalty(R,t,2) :- exec(R,A,t),
+                  A != wait,
+                  on(R,X,Y,t),
+                  not best_action(R,X,Y,A).
+
+penalty(R,t,1) :- waited_on_goal(R,t),
+				  exec(R,A,T),
+				  A != wait,
+				  t <= T.
+
+waited_on_goal(R,t) :- at_goal(R,t), exec(R,wait,t).
+
+:- on(R,X,Y,t), not rangeX(X).
+:- on(R,X,Y,t), not rangeY(Y).
+:- on(R1,X,Y,t),on(R2,X,Y,t),R1!=R2. % no hay dos robots en la misma posicion
+:- on(R,X,Y,t),obstacle(X,Y). %no hay robots encima de obstaculos
+
+at_goal(R,t) :- robot(R), on(R,X,Y,t), goal(R,X,Y).
 
 
-final(T) :- time(T), on(R,X,Y,T) : goal(R,X,Y).
-end :- time(T),final(T).
-:- not end.
-
-#minimize {P,R,T : penalty(R,T,P)}.
 
 
-%#show goal/3.
-%#show obstacle/2.
-%#show on/4.
-#show final/1.
-%#show exec/3.
+#minimize {P,R,t : penalty(R,t,P)}.
+
+
+#program check(t).
+#external query(t).
+:- robot(R), not at_goal(R,t), query(t).
+
+
+
+
+#program base.
+#show on/4.
+#show exec/3.
+#show penalty/3.

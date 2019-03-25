@@ -48,3 +48,41 @@ at_goal(R,T) :- robot(R),time(T), on(R,X,Y,T), goal(R,X,Y).
 %#show exec/3.
 #show rangeX/1.
 #show rangeY/1.
+
+
+#program wait_penalty(t, tmax).
+#external activate_penalty(tmax).
+penalty(R,t,5) :- waited_on_goal(R,t),
+				  exec(R,A,tmax),
+				  A != wait.
+
+
+#program step(t).
+1 {exec(R,A,t) : action(A)} 1 :- robot(R).
+penalty(R,t,1) :- exec(R,wait,t),
+                  on(R,X,Y,t),
+                  not best_action(R,X,Y,wait).
+
+penalty(R,t,2) :- exec(R,A,t),
+                  A != wait,
+                  on(R,X,Y,t),
+                  not best_action(R,X,Y,A).
+
+
+waited_on_goal(R,t) :- at_goal(R,t), exec(R,wait,t).
+
+
+penalty(R,t,1) :- waited_on_goal(R,t),
+				  exec(R,A,T),
+				  A != wait,
+				  t < T.
+
+waited_on_goal(R,t) :- at_goal(R,t), exec(R,wait,t).
+
+
+penalty(R,t,X) :- waited_cost(R, t, X),
+				  exec(R,A,T),
+				  A != wait.
+
+waited_cost(R, T, 0) :- at_goal(R, T).
+waited_cost(R, T, X) :- at_(R, T+1)

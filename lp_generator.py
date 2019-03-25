@@ -219,16 +219,16 @@ class Problem:
                 self.total_cost += 1
                 self.agent_cost[ag] += 1
 
-                print((posX,posY))
+                #print((posX,posY))
                 ag_sol.append((posX,posY))
                 t+=1
 
             self.sol.append(ag_sol)
 
         self.min_sum = self.total_cost - self.max_time
-        print(self.sol)
-        print('----')
-        print(self.max_time)
+        #print(self.sol)
+        #print('----')
+        #print(self.max_time)
         self.solved = True
 
     def write_to_lp(self, outp):
@@ -353,7 +353,7 @@ class Problem:
 
 
     def clingo_solve(self, inp):
-        solv = asp_solver.Application(inp, self.max_time, self.num_agents)
+        solv = asp_solver.IncrementalSolver(inp, self.max_time, self.num_agents, self.min_sum, self.total_cost)
         clingo.clingo_main(solv, [inp, '-t', '4'])
         self.sol = solv.resp
         self.sol_time = solv.sol_time
