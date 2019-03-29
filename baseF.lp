@@ -28,12 +28,11 @@ penalty(R,t,2) :- exec(R,A,t),
                   on(R,X,Y,t),
                   not best_action(R,X,Y,A).
 
-penalty(R,t,1) :- waited_on_goal(R,t),
-				  exec(R,A,T),
-				  A != wait,
-				  t <= T.
+               
 
-waited_on_goal(R,t) :- at_goal(R,t), exec(R,wait,t).
+
+
+moved_on_goal(R,t) :- at_goal(R,t), exec(R,A,t), A!= wait.
 
 :- on(R,X,Y,t), not rangeX(X).
 :- on(R,X,Y,t), not rangeY(Y).
@@ -41,7 +40,6 @@ waited_on_goal(R,t) :- at_goal(R,t), exec(R,wait,t).
 :- on(R,X,Y,t),obstacle(X,Y). %no hay robots encima de obstaculos
 
 at_goal(R,t) :- robot(R), on(R,X,Y,t), goal(R,X,Y).
-
 
 
 
@@ -57,5 +55,6 @@ at_goal(R,t) :- robot(R), on(R,X,Y,t), goal(R,X,Y).
 
 #program base.
 #show on/4.
-#show exec/3.
-#show penalty/3.
+%#show exec/3.
+%#show penalty/3.
+#show moved_on_goal/2.
