@@ -1,1 +1,53 @@
+\newcommand{\Up}{\ensuremath{\mathit{up}}}
+\newcommand{\Down}{\ensuremath{\mathit{down}}}
+\newcommand{\Left}{\ensuremath{\mathit{left}}}
+\newcommand{\Right}{\ensuremath{\mathit{right}}}
+\newcommand{\Wait}{\ensuremath{\mathit{wait}}}
+
+
 \section{From Cost-Optimal MAPF to ASP}
+The core of our translation of MAPF to ASP, like other existing encodings, is inspired by translations from planning to SAT \cite{}, where the makespan $m$ is a parameter of the encoding. Given a MAPF problem $P$, our ASP program that has a model iff there exists a conflict-free solution of makespan $m$. Moreover, if the program has a model then such a model describes a cost-optimal solution.
+
+To represent the map, we use the predicates $rangeX/1$, $rangeY/1$ and $obstacle/2$, where the first two are used to define the size of the grid and the third to define the $(X,Y)$ that are obstacles. For each robot $R\in\{1,\ldots,r\}$ we add a fact of the form $goal(R,X_R,Y_R)$ establishing that $(X_R,Y_R)$ is the goal of $R$.
+
+Our translation uses predicates to represent the position of the agents and the actions performed at each time step in $\mathcal{T}=\{0,\ldots,m\}$. Specifically, the atom $exec(R,A,T)$ represents the fact that robot $R$ performs action $A$ at time $T$, where $T$ can take any value in $\{0,\ldots,m-1\}$, and $A$ a value in $\mathcal{A}=\{\Up,\Down,\Left,\Right,\Wait\}$.
+
+To model the position of agents, we use predicate $at$, such that $at(R,X,Y,T)$ represents that robot $R$ is at cell $(X,Y)$ at time $T$. Its dynamics is defined by rules of the form:
+\begin{equation}
+\begin{split}
+at(R,X,Y,t) \leftarrow &exec(R,A,t-1),at(R,X',Y',t-1), \\&delta(A,X',Y',X,Y), \label{position}
+\end{split}
+\end{equation}
+for each $t\in\{1,\ldots,m\}$, which state that the position of robot $R$ is $(X,Y)$ at time $T$ when the position of the robot at time $T-1$ was $(X',Y')$ and the agent performs an action $A\in\mathcal{A}$ that is such that $delta(A,X',Y',X,Y)$ holds true. Predicate $delta$ is defined in the obvious way for each action $A$; for example, the encoding includes a rule that establishes that atom $delta(\Right,X,Y,X+1,Y)$ is in a model whenever $(X,Y)$ is a cell in the map. We observe that the number of rules of form \eqref{position} is $\mathcal{O}(rmC)$, where $C$ is the number of cells in the map.
+
+To express the fact that each agent performs exactly one action at any time step in $t\in\{0,\ldots, T-1\}$ we write:
+\begin{equation}
+  1 \{exec(R,A,t) : action(A)\} 1 \leftarrow robot(R).
+\end{equation}
+These are exactly $R$ generating rules that force the cardinality of the set $\{exec(R,A,t) : action(A)\}$ to be exactly one. We note that the encoding is such that atom is in every model $action(A)$, for each action in $\mathcal{A}$.
+
+The two rules above do not restrict the moves of the agent enough. First we establish that no two different agents are allowed to cross the border of a cell in parallel. To that end, for every $t\in\{1,\ldots,m\}$ we add:
+\begin{gather}
+  \begin{split}
+\leftarrow &on(R_1,X+1,Y,t-1), on(R_2,X,Y,t-1), \\ &on(R_1,X,Y,t), on(R_2,X+1,Y,t),R_1!=R_2.
+\end{split}\\
+\begin{split}
+\leftarrow &on(R_1,X,Y+1,t-1), on(R_2,X,Y,t-1),\\ &on(R_1,X,Y,t), on(R_2,X,Y+1,t),R_1!=R_2.
+\end{split}
+\end{gather}
+Observe that this generates $\mathcal{O}(r^2mC)$ rules in the grounded representation. In addition, no two robots can be at the same cell, and no robot can exit the map, so for every $t\in \{0,\ldots,m\}$ we generate:
+\begin{align}
+&\leftarrow on(R,X,Y,t), not\: rangeX(X).\\
+&\leftarrow on(R,X,Y,t), not\: rangeY(Y). \\
+&\leftarrow on(R_1,X,Y,t),on(R_2,X,Y,t),R_1!=R_2. \\
+&\leftarrow on(R,X,Y,t),obstacle(X,Y).
+\end{align}
+Finally, we express that all robots have to be in their goal position at time step $m$:
+\begin{align}
+  \leftarrow robot(R), not\: at\_goal(R,t),
+\end{align}
+where $at\_goal/2$ is defined in the following way:
+\begin{align}
+at\_goal(R,m) \leftarrow on(R,X,Y,m), goal(R,X,Y).
+\end{align}
+\subsection{Cost-Optimal Solutions}

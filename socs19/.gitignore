@@ -37,6 +37,8 @@ tmp*
 *.pdfsync
 pdfs/*
 *.dpth
+*.fdb_latexmk
+*.fls
 main*.pdf
 
 # Standard VS.NET and ReSharper Foo
