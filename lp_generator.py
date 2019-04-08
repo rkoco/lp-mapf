@@ -279,6 +279,7 @@ class Problem:
             #     out_file.write('\n\n')
 
             # Best directions for each agent:
+            '''
             out_file.write('%% Direction for each agent position: \n')
             for ag in range(self.num_agents):
                 for y in range(self.height):
@@ -287,12 +288,15 @@ class Problem:
                         for d in dirs:
                             out_file.write('best_action(r{0},{1},{2},{3}).\n'.format(ag+1, x, y, d))
                 out_file.write('\n\n')
+            '''
 
             #Base info for the grid world in lp
+            '''
             with open('baseF.lp', 'r') as base_file:
                 out_file.write('%% Grid world info: \n')
                 for line in base_file.readlines():
                     out_file.write(line)
+            '''
 
     def change_format(self, outp, num):
         with open('{0}{1}'.format(outp, ''), 'w') as out_file:

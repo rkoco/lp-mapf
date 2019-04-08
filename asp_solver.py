@@ -12,7 +12,7 @@ class IncrementalSolver:
     2: 1 solver call with optimum makespan
     '''
 
-    def __init__(self, name, minimum_time, num_agents, min_sum, total_cost, solv_type):
+    def __init__(self, name, minimum_time, num_agents, min_sum, total_cost, solv_type, only_first):
         self.program_name = name
         self.minimum_time = minimum_time
         self.min_sum = min_sum
@@ -34,8 +34,10 @@ class IncrementalSolver:
         self.makespan = -1
         
         self.solv_type = solv_type
-
         self.first_runtime = 0
+
+        self.only_first = only_first
+        self.sol_cost = -1
 
 
 
@@ -46,7 +48,29 @@ class IncrementalSolver:
             self.run_continuous_delta(ctl, files)
         elif self.solv_type == 2:
             self.run_opt_bound(ctl, files)
+        elif self.solv_type == 3:
+            self.run_extra(ctl, files)
+        elif self.solv_type == 4:
+            self.run_aaa(ctl, files)
 
+    def run_aaa(self, ctl, files):
+        if len(files) > 0:
+            for f in files:
+                ctl.load(f)
+        else:
+            ctl.load("-")
+        
+        ctl.ground([("base", [])])
+        ret = ctl.solve()
+        print(ret.satisfiable)
+        if ret.satisfiable:
+            self.stats = ctl.statistics
+            self.first_stats = ctl.statistics
+            self.sol_cost = ctl.statistics['summary']['costs'][0]
+            #print(self.sol_cost)
+            delta = self.sol_cost - self.minimum_time - self.min_sum
+            imax = self.minimum_time + delta
+            self.theoric_makespan = imax
 
 
     def run_constant_delta(self, ctl, files):
@@ -89,29 +113,39 @@ class IncrementalSolver:
             parts.append(("step", [step]))
 
             if step > 0:
-                ctl.release_external(clingo.Function("query", [step-1]))
+                #ctl.release_external(clingo.Function("query", [step-1]))
                 parts.append(("evolution",[step]))
                 ctl.cleanup()
 
             else:
                 parts.append(("base", []))
 
+            if step > imin:
+                ctl.release_external(clingo.Function("query", [step-1]))
+                ctl.cleanup()
+
             ctl.ground(parts)
             ctl.assign_external(clingo.Function("query", [step]), True)
             
 
             if not self.solved or step == imax:
-                print('solving on makespan {0}'.format(step))
+                print('solving on makespan --- {0}'.format(step))
                 ret = ctl.solve(on_model=self.on_model)
                 if ret.satisfiable:
                     self.stats = ctl.statistics
                     self.makespan = step
-                    self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
+                    #self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
+                    print("----")
+                    self.sol_cost = self.stats['summary']['costs'][0]
+                    #print(self.stats['summary']['costs'][0])
+
 
                     if not self.solved:
                         delta = self.sol_cost - self.makespan - self.min_sum
                         imax = step + delta
                         self.theoric_makespan = imax
+                        print(self.min_sum)
+                        print("----")
 
                         self.solved = True
                         self.first_stats = self.stats
@@ -123,6 +157,10 @@ class IncrementalSolver:
                         if step == imax:
                             self.opt_makespan = step
                             self.final_solved = True
+
+                        if self.only_first:
+                            break
+
 
                     else:
                         self.opt_makespan = step
@@ -170,13 +208,14 @@ class IncrementalSolver:
             parts.append(("step", [step]))
 
             if step > 0:
-                ctl.release_external(clingo.Function("query", [step-1]))
                 parts.append(("evolution",[step]))
-                ctl.cleanup()
-
             else:
                 parts.append(("base", []))
                 #parts.append(("step",[step]))
+
+            if step > imin:
+                ctl.release_external(clingo.Function("query", [step-1]))
+                ctl.cleanup()
 
             ctl.ground(parts)
             ctl.assign_external(clingo.Function("query", [step]), True)
@@ -237,7 +276,6 @@ class IncrementalSolver:
             step += 1
 
 
-
         #Last step:
         for a in range(self.num_agents):
             self.resp[a].append((0,0))
@@ -261,6 +299,8 @@ class IncrementalSolver:
             self.stats = ctl.statistics
             self.makespan = step
             self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
+            print(self.sol_cost)
+
             delta = self.sol_cost - self.makespan - self.min_sum
             self.theoric_makespan = imin
             
@@ -272,7 +312,6 @@ class IncrementalSolver:
                 self.current_makespan = step
 
 
-
     def on_model(self,m):
         #print(m.symbols(shown=True))
         self.moved_on_goal = False
@@ -280,7 +319,7 @@ class IncrementalSolver:
             if sym.name == "on":
                 args = sym.arguments
                 robot = int(args[0].name[-1:])-1
-                self.resp[robot][args[3].number] = (args[1].number,args[2].number)
+                #self.resp[robot][args[3].number] = (args[1].number,args[2].number)
 
             if sym.name == "moved_on_goal":
                 self.moved_on_goal = True
