@@ -1,0 +1,2 @@
+sep=;
+Instance; First_solved; ;Models; Optimum; Calls;Threads;MIN-Timestep;Min-SUMTIME; ;1stTime(Total); 1stTime(Solving);1stTime(Unsat); 1stCPU Time;1stOptimization;1stSOL-COST; 1st Makespan; ;OPT - Optimization; OPT- Time(Total); OPT-Time(Solving); OPT-Time(Unsat); OPT-CPU Time; OPT-SOL-COST; Last-Makespan ;OPT-Makespan; OPT-Solved;Moved On Goal; Theoric Makespan; 1stRunTime ;Total RunTime; Called Extra

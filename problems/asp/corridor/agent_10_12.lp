@@ -1296,6 +1296,7 @@ on(R,X,Y,t) :- exec(R,A,t-1),on(R,Xp,Yp,t-1),delta(A,Xp,Yp,X,Y).
 
 #program step(t).
 1 {exec(R,A,t) : action(A)} 1 :- robot(R).
+
 penalty(R,t,1) :- exec(R,wait,t),
                   on(R,X,Y,t),
                   not best_action(R,X,Y,wait).
@@ -1304,6 +1305,10 @@ penalty(R,t,2) :- exec(R,A,t),
                   A != wait,
                   on(R,X,Y,t),
                   not best_action(R,X,Y,A).
+
+
+
+moved_on_goal(R,t) :- at_goal(R,t), exec(R,A,t), A!= wait.
 
 :- on(R,X,Y,t), not rangeX(X).
 :- on(R,X,Y,t), not rangeY(Y).
@@ -1314,9 +1319,8 @@ at_goal(R,t) :- robot(R), on(R,X,Y,t), goal(R,X,Y).
 
 
 
+
 #minimize {P,R,t : penalty(R,t,P)}.
-
-
 
 
 #program check(t).
@@ -1330,3 +1334,4 @@ at_goal(R,t) :- robot(R), on(R,X,Y,t), goal(R,X,Y).
 #show on/4.
 #show exec/3.
 #show penalty/3.
+#show moved_on_goal/2.

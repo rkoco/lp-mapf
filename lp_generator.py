@@ -279,6 +279,7 @@ class Problem:
             #     out_file.write('\n\n')
 
             # Best directions for each agent:
+            '''
             out_file.write('%% Direction for each agent position: \n')
             for ag in range(self.num_agents):
                 for y in range(self.height):
@@ -287,12 +288,15 @@ class Problem:
                         for d in dirs:
                             out_file.write('best_action(r{0},{1},{2},{3}).\n'.format(ag+1, x, y, d))
                 out_file.write('\n\n')
+            '''
 
             #Base info for the grid world in lp
+            '''
             with open('baseF.lp', 'r') as base_file:
                 out_file.write('%% Grid world info: \n')
                 for line in base_file.readlines():
                     out_file.write(line)
+            '''
 
     def change_format(self, outp, num):
         with open('{0}{1}'.format(outp, ''), 'w') as out_file:
@@ -353,71 +357,7 @@ class Problem:
 
 
     def clingo_solve(self, inp):
-        solv = asp_solver.IncrementalSolver(inp, self.max_time, self.num_agents, self.min_sum, self.total_cost)
+        solv = asp_solver.IncrementalSolver(inp, self.max_time, self.num_agents, self.min_sum, self.total_cost, 0)
         clingo.clingo_main(solv, [inp, '-t', '4'])
         self.sol = solv.resp
-        self.sol_time = solv.sol_time
-
-
-def generate_instances():
-    '''
-    for entry in os.scandir('problems/original/grid10/'): 
-        #print("Instance-10-20-6-{0}".format(i))
-        #i+=1
-        #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
-        problem = Problem(30)
-        problem.read_instance(entry.path)
-        #problem.read_map('OriginalCorridor/corridor.map')
-        #problem.read_agents(entry.path)
-        for ag in range(problem.num_agents):
-            print(ag)
-            problem.solve_agent(ag)
-        
-        #print('{0}'.format(problem.opt_timestep))
-
-        problem.write_to_lp('problems/asp/grid10/{0}'.format(entry.name.split('.')[0]))
-    
-
-
-    
-    i = 0
-    for i in range(10):
-
-        inp = 'problems/original/grid10_2/Instance-10-20-20-{0}'.format(i)
-        #i+=1
-        #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
-        problem = Problem(40)
-        problem.read_instance(inp)
-        #problem.read_map('problems/original/grid32/32x32_20obs.map')
-        #problem.read_agents(inp)
-        for ag in range(problem.num_agents):
-            #print(ag)
-            problem.solve_agent(ag)
-        problem.calc_time()
-
-        #print('{0}'.format(problem.opt_timestep))
-        outp = 'problems/asp/grid10_2/Instance-10-20-20-{0}'.format(i)
-        
-        #print(outp)
-        #problem.write_to_lp('Instances/Corridor3/{0}'.format(inp.split('.')[0]))
-        problem.write_to_lp(outp)
-
-        #problem.change_format('OriginalCorridor/Instances/{0}'.format(entry.name.split('.')[0]), entry.name.split('_')[2].split('.')[0])
-        '''
-
-    inp = 'problems/original/grid10/Instance-10-20-6-49'
-    problem = Problem(30)
-    problem.read_instance(inp)
-    #for ag in range(problem.num_agents):
-    #    problem.solve_agent(ag)
-
-    outp = 'ins17'
-    problem.write_to_lp(outp)
-
-
-
-def main():
-    generate_instances()
-
-if __name__ == '__main__':
-    main()
+        self.sol_time = solv.makespan
