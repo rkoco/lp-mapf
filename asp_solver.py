@@ -2,6 +2,12 @@ import sys
 import clingo
 import json
 import time
+import traceback
+import signal
+from threading import Thread
+from time import sleep
+import os
+
 
 class IncrementalSolver:
 
@@ -38,6 +44,7 @@ class IncrementalSolver:
 
         self.only_first = only_first
         self.sol_cost = -1
+        self.ground_time = 0
 
 
 
@@ -51,25 +58,67 @@ class IncrementalSolver:
         elif self.solv_type == 3:
             self.run_extra(ctl, files)
         elif self.solv_type == 4:
-            self.run_aaa(ctl, files)
+            self.run_standard(ctl, files)
 
-    def run_aaa(self, ctl, files):
+    def run_standard(self, ctl, files):
         if len(files) > 0:
             for f in files:
                 ctl.load(f)
         else:
             ctl.load("-")
+
+        #self.resp = []
         
+        step = 0
+        while (step <= self.minimum_time):
+            for a in range(self.num_agents):
+                self.resp[a].append((0,0))
+            step+=1
+        
+        
+        init_time = time.time()
+        
+        #signal.signal(signal.SIGINT, self.signal_handler)
+        '''
+        catchable_sigs = set(signal.Signals)
+        for sig in catchable_sigs:
+            try:
+                signal.signal(sig, self.signal_handler)
+                print("Setting ",sig)
+                print ("value {}".format(sig))
+            except (ValueError, OSError, RuntimeError) as m:
+                print(m)
+                print("Skipping ",sig)
+                print ("Value {}".format(sig)) 
+        '''
+
+
+        #thread = Thread(target=self.ground, args = [ctl])
+        #thread.start()
+        #ctl.interrupt()
+        #thread.join(10)
         ctl.ground([("base", [])])
-        ret = ctl.solve()
-        print(ret.satisfiable)
+
+        self.ground_time = time.time() - init_time
+        ret = ctl.solve(on_model=self.on_model)
         if ret.satisfiable:
             self.stats = ctl.statistics
-            self.first_stats = ctl.statistics
-            self.sol_cost = ctl.statistics['summary']['costs'][0]
+            #self.first_stats = ctl.statistics
+            #print(json.dumps(self.stats, sort_keys=True, indent=4, separators=(',', ': ')))
+
+            self.sol_cost = self.minimum_time * self.num_agents + ctl.statistics['summary']['costs'][0]
+
+            #self.sol_cost = ctl.statistics['summary']['costs'][0]
+            print('sic:', self.total_cost, 'optimization:',ctl.statistics['summary']['costs'][0], 'sol_cost:',self.sol_cost,'makespan:', self.minimum_time, 'agents:', self.num_agents)
+            #self.sol_cost = ctl.statistics['summary']['costs'][0]
             #print(self.sol_cost)
-            delta = self.sol_cost - self.minimum_time - self.min_sum
-            imax = self.minimum_time + delta
+            #print(self.sol_cost)
+            #delta = self.sol_cost - self.minimum_time - self.min_sum
+            imax = self.minimum_time + self.sol_cost - 1 - self.total_cost
+            if imax < self.minimum_time:
+                imax = self.minimum_time
+
+            #imax = self.minimum_time + delta
             self.theoric_makespan = imax
 
 
@@ -134,9 +183,11 @@ class IncrementalSolver:
                 if ret.satisfiable:
                     self.stats = ctl.statistics
                     self.makespan = step
-                    #self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
+                    self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
                     print("----")
-                    self.sol_cost = self.stats['summary']['costs'][0]
+                    print(self.sol_cost)
+
+                    #self.sol_cost = self.stats['summary']['costs'][0]
                     #print(self.stats['summary']['costs'][0])
 
 
@@ -225,7 +276,7 @@ class IncrementalSolver:
             if ret.satisfiable:
                 self.stats = ctl.statistics
                 self.makespan = step
-                self.sol_cost = self.total_cost + self.stats['summary']['costs'][0]
+                self.sol_cost = self.stats['summary']['costs'][0]
                 delta = self.sol_cost - self.makespan - self.min_sum
                 new_max = step + delta
 
@@ -318,25 +369,29 @@ class IncrementalSolver:
         for sym in m.symbols(shown=True):
             if sym.name == "on":
                 args = sym.arguments
-                robot = int(args[0].name[-1:])-1
-                #self.resp[robot][args[3].number] = (args[1].number,args[2].number)
+                #print(args)
+                robot = int(args[0].number)
+                self.resp[robot][args[3].number] = (args[1].number,args[2].number)
 
-            if sym.name == "moved_on_goal":
-                self.moved_on_goal = True
+            #if sym.name == "moved_on_goal":
+            #    self.moved_on_goal = True
 
+            #if sym.name == "dijkstra":
+            #    print(sym)
 
+            #if sym.name == "dijkstra2":
+            #    print(sym)
 
-            '''
-            if sym.name == "exec":
-                args = sym.arguments
-                robot = int(args[0].name[-1:])-1
+            #if sym.name == "exec":
+            #    args = sym.arguments
+            #    robot = int(args[0].name[-1:])-1
 
-            if sym.name == "penalty":
-                args = sym.arguments
-                robot = int(args[0].name[-1:])-1
-                if robot == 4:
-                    print(sym)
-            '''
+            #if sym.name == "penalty":
+            #    args = sym.arguments
+            #    robot = int(args[0].name[-1:])-1
+            #    if robot == 4:
+            #        print(sym)
+            
                     
 
             #print(self.resp)
@@ -360,8 +415,17 @@ class ConstantSolver:
 
 
 if __name__ == '__main__':
-    print(sys.argv)
-    print(clingo.__version__)
+    try:
+        print(sys.argv)
+        print(clingo.__version__)
+        print("hola")
+
+    except:
+        traceback.print_exc()
+
+    x = input()    
+    '''
     app = IncrementalSolver(sys.argv[0], 10, 10)
     clingo.clingo_main(app, sys.argv[1:])
+    '''
 

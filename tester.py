@@ -6,7 +6,10 @@ import json
 import locale
 import time
 
-def run_test(solver_type, problem_folder, call_extra, only_first_sol):
+
+
+
+def run_test(solver_type, problem_folder, call_extra, only_first_sol, base_path):
 
 
     opt_makespans = []
@@ -16,138 +19,175 @@ def run_test(solver_type, problem_folder, call_extra, only_first_sol):
 
 
 
-    with open('problems/asp/{0}/results{1}_aaa.csv'.format(problem_folder, solver_type), 'w') as results:
+    with open('results/results_{0}_{1}_last.csv'.format(problem_folder, base_path.split('/')[-1]), 'w') as results:
         results.write('sep=;\n')
-        results.write('Instance; First_solved; ;Models; Optimum; Calls;Threads;MIN-Timestep;Min-SUMTIME; ;'
+        '''
+        results.write('Instance; First_solved;solved;Models; Optimum; Calls;Threads;MIN-Timestep;Min-SUMTIME; ;'
             '1stTime(Total); 1stTime(Solving);1stTime(Unsat); 1stCPU Time;1stOptimization;1stSOL-COST; 1st Makespan; ;'
             'OPT - Optimization; OPT- Time(Total); OPT-Time(Solving); OPT-Time(Unsat); OPT-CPU Time; OPT-SOL-COST; Last-Makespan ;OPT-Makespan; OPT-Solved;' 
-            'Moved On Goal; Theoric Makespan; 1stRunTime ;Total RunTime; Called Extra\n')
+            'Moved On Goal; Theoric Makespan; 1stRunTime ;Total RunTime; Ground Time; Percent Grounding; Called Extra; Atoms; Bodies; Rules; Total\n')
+        '''
         
-        i = 0
-        l1 = [0,5,10]
+        results.write('Instance; First_solved;solved;;'
+            '1stOPT;1stSOL-COST;1stMakespan;1stTheoricMakespan;1stRunTime;1stGroundTime;1stGroundPerc;1stAtoms;1stBodies;1stRules;1stTotal;;'
+            'OPT;SOL-COST;Makespan;TheoricMakespan;RunTime;GroundTime;GroundPerc;Atoms;Bodies;Rules;Total\n')
+
+        print(base_path.split('/')[-1])
+
+
+        i = 1
+        #l1 = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+        #l1 = [0,5,10,15,20,25,30]
+        #l1 = [12,18,24,30]
+        #l1 = [14,16,18,20,22,24,26,28,30]
+        #l1 = [40,45,50,55,60,65,70,75,80]
+        l1 = [20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50]
+        #l1 = [42,44,46,48,50]
+        #l1 = [1,60,65,70,75,80,85,90,95,100,100]
+        #l1 = [42,44,46,48,50]
+        l1 = [50]
         for x in l1:
             for y in range(10):
-                name = 'Instance-8-{0}-10-{1}'.format(x,y)
+                name = 'Instance-20-10-{0}-{1}'.format(x,y)
+                #name = 'brc202d-{0}-{1}'.format(x,y)
                 path = 'problems/original/{0}/Instances/{1}'.format(problem_folder, name)
+                i+=1           
 
-        #for entry in os.scandir('problems/original/{0}/Instances/'.format(problem_folder)):
-                i+=1
+                if y != 5:
+                    continue
+                #print(name)
+                '''
+                if x < 38:
+                    continue
 
+                if x == 38 and (y <= 6 or y == 8):
+                   continue 
 
+                if x == 40 and (y == 0 or y == 2 or y == 3 or y == 4 or y == 8):
+                    continue
+                    '''
 
-
-                print(name, path)
-                
-
-
-                #print("Instance-10-20-6-{0}".format(i))
-                #print('me.RunInstance("{}");'.format(entry.name.split('.')[0]))
-                print('Creating lp...')
                 problem = lp_generator.Problem(50)
+                print('reading instance')
                 problem.read_instance(path)
-                #problem.read_map('OriginalCorridor/corridor.map')
-                #problem.read_agents(entry.path)
+                print('generating solution')
                 problem.gen_solution()
+
 
                 path = 'problems/asp/{0}/{1}'.format(problem_folder,name)
                 problem.write_to_lp(path)
                 
                 print('Solving with clingo...')
-                solv = asp_solver.IncrementalSolver('{0}.lp'.format(path), problem.max_time, problem.num_agents, problem.min_sum, problem.total_cost, solver_type, only_first_sol)
-
-
-                #If it is makespan opt solver, define the bound on the solver
-                if solver_type == 2:
-                    solv.opt_makespan = opt_makespans[i]
+            
 
                 start_time = time.time()
-                clingo.clingo_main(solv, ['{0}.lp'.format(path), 'baseAExtra.lp', '--outf=3' , '--opt-strategy=usc,disjoint', '--time-limit=300'])
+                num = problem.max_time
+                ground_time = 0
+                ground_time0 = 0
+                runtime = 0
+                runtime0 = 0
+
+                print(num)
+                first_solved = False
+                solved = False
+
+
+                solv0 = None
+                solv = None
+
+                curr = 300
+
+                while True:
+
+
+                    solv0 = asp_solver.IncrementalSolver('{0}.lp'.format(path), num, problem.num_agents, problem.min_sum, problem.total_cost, solver_type, only_first_sol)
+                    clingo.clingo_main(solv0, ['{0}.lp'.format(path), '{0}.lp'.format(base_path) , '--outf=3', '--opt-strat=usc,disjoint', '--time-limit={0}'.format(curr), '-t', '4', '-c','bound={0}'.format(num)])
+                    #print(solv0.ground_time)
+                    ground_time += solv0.ground_time
+
+                    elapsed = time.time() - start_time
+                    curr = int(300 - elapsed)
+                    print(curr)
+
+                    if curr < 0:
+                        break
+
+
+                    if solv0.sol_cost > 0:
+                        runtime0 = time.time() - start_time
+                        ms = int(solv0.theoric_makespan)
+                        first_solved = True
+                        ground_time0 = ground_time
+
+
+                        print(ms)
+                        if ms == num:
+                            solv = solv0
+                            solved = True
+                            runtime = runtime0
+                            break
+
+                        break
+
+
+                        
+
+                        solv = asp_solver.IncrementalSolver('{0}.lp'.format(path), ms, problem.num_agents, problem.min_sum, problem.total_cost, solver_type, only_first_sol)
+                        clingo.clingo_main(solv, ['{0}.lp'.format(path), '{0}.lp'.format(base_path) ,  '--outf=3', '--opt-strat=usc,disjoint', '--time-limit={0}'.format(curr), '-t', '4', '-c','bound={0}'.format(ms)])
+
+                        ground_time += solv.ground_time
+                        if solv.stats is not None:
+                            runtime = time.time() - start_time
+                            summary = solv.stats['summary']
+                            solved = True
+                        break
+                    num += 1
+                    print(num)
 
 
 
-                theoric_makespan = solv.theoric_makespan
-                solv = asp_solver.IncrementalSolver('{0}.lp'.format(path), theoric_makespan, problem.num_agents, problem.min_sum, problem.total_cost, solver_type, only_first_sol)
-                clingo.clingo_main(solv, ['{0}.lp'.format(path), 'baseAExtra.lp', '--outf=3' ,'--opt-strategy=usc,disjoint', '--time-limit=300'])
-
-
-                '''
-                clingo.clingo_main(solv, ['{0}.lp'.format(path), '--heuristic=Vsids', 
-                    '--outf=3' , '--restarts=D,1000,0.7', '--deletion=basic,50', '--del-init=3.0,500,19500', '--del-grow=no', '--del-cfl=+,10000,2000', '--del-glue=2',
-                    '--strengthen=recursive', '--update-lbd=less', '--otfs=2', '--save-p=100', '--counter-restarts=3,1023', '--reverse-arcs=2', '--contraction=0',
-                    '--loops=common', '--opt-heu=sign', '--opt-strat=usc,disjoint', '--time-limit=300', '-t', '4'])
-                '''
-
-                called_extra = False
-
-                if solv.moved_on_goal and call_extra and solv.theoric_makespan != -1:
-                    
-                    first_call_time = time.time() - start_time
-                    makespan = check_makespan(solv.resp)
-                    solv = asp_solver.IncrementalSolver('{0}.lp'.format(path), makespan, problem.num_agents, problem.min_sum, problem.total_cost, solver_type, only_first_sol)
-                    clingo.clingo_main(solv, ['{0}.lp'.format(path), 'baseAExtra.lp' , '--outf=3' , '--opt-strategy=usc,disjoint', '--time-limit=300'])
-
-                    theoric_makespan = solv.theoric_makespan
-                    if theoric_makespan > makespan:
-                        solv = asp_solver.IncrementalSolver('{0}.lp'.format(path), theoric_makespan, problem.num_agents ,problem.min_sum, problem.total_cost, solver_type, only_first_sol)
-                        clingo.clingo_main(solv, ['{0}.lp'.format(path), 'baseAExtra.lp' , '--outf=3' , '--opt-strategy=usc,disjoint', '--time-limit=300'])
-
-                    solv.first_runtime += first_call_time
-                    called_extra = True
-
-
-                if solv.theoric_makespan == -1:
-                    solv.stats = None
-
-
-
-                elapsed_time = time.time() - start_time
+                
                 #sol = solv.resp
                 row = [name]
-                print("Costo:", solv.sol_cost)
+                #print(solv.sol_cost)
 
-                if solv.stats is not None:
+                if first_solved:
 
-                    summary = solv.stats['summary']
-                    summary0 = solv.first_stats['summary']
-
-                    #print(json.dumps(stats, sort_keys=True, indent=4, separators=(',', ': ')))
+                    #print(json.dumps(solv.stats, sort_keys=True, indent=4, separators=(',', ': ')))
 
                     row.append(1)
-                    row.append(format_float(summary['models']['enumerated']))
-                    row.append(format_float(summary['models']['optimal']))
-                    row.append(format_float(summary['call']))
-                    row.append(format_float(summary['winner']))
-                    row.append(format_float(problem.max_time))
-                    row.append(format_float(problem.total_cost))
+                    row.append(0)
                     row.append('\t')
 
-                    row.append(format_float(summary0['times']['total']))
-                    row.append(format_float(summary0['times']['solve']))
-                    row.append(format_float(summary0['times']['unsat']))
-                    row.append(format_float(summary0['times']['cpu']))
-                    row.append(format_float(summary0['costs'][0]))
-                    row.append(format_float((problem.total_cost + summary0['costs'][0])))
-                    row.append(solv.first_makespan)
+                    row.append(format_float(solv0.stats['summary']['costs'][0]))
+                    row.append(format_float(solv0.sol_cost))
+                    row.append('-1')
+                    row.append(int(solv0.theoric_makespan))
+                    row.append(format_float(runtime0))
+                    row.append(format_float(ground_time0))
+                    row.append(format_float(ground_time0/runtime0*100))
+                    row.append(format_float(solv0.stats['problem']['lp']['atoms']))
+                    row.append(format_float(solv0.stats['problem']['lp']['bodies']))
+                    row.append(format_float(solv0.stats['problem']['lp']['rules']))
+                    row.append(format_float(solv0.stats['problem']['lp']['atoms'] + solv0.stats['problem']['lp']['bodies'] + solv0.stats['problem']['lp']['rules']))
                     row.append('\t')
 
-                    row.append(format_float(summary['costs'][0]))
-                    row.append(format_float(summary['times']['total']))
-                    row.append(format_float(summary['times']['solve']))
-                    row.append(format_float(summary['times']['unsat']))
-                    row.append(format_float(summary['times']['cpu']))
-                    row.append(format_float((problem.total_cost + summary['costs'][0])))
-                    row.append(solv.makespan)
-                    row.append(solv.opt_makespan)
-
-
-                    row.append(solv.final_solved)
-                    row.append(solv.moved_on_goal)
-                    row.append(format_float(solv.theoric_makespan))
-                    row.append(format_float(solv.first_runtime))
-                    row.append(format_float(elapsed_time))
-                    row.append(called_extra)
+                    if solved:
+                        row[2] = 1
+                        row.append(format_float(solv.stats['summary']['costs'][0]))
+                        row.append(format_float(solv.sol_cost))
+                        row.append('-1')
+                        row.append(int(solv.theoric_makespan))
+                        row.append(format_float(runtime))
+                        row.append(format_float(ground_time))
+                        row.append(format_float(ground_time/runtime*100))
+                        row.append(format_float(solv.stats['problem']['lp']['atoms']))
+                        row.append(format_float(solv.stats['problem']['lp']['bodies']))
+                        row.append(format_float(solv.stats['problem']['lp']['rules']))
+                        row.append(format_float(solv.stats['problem']['lp']['atoms'] + solv.stats['problem']['lp']['bodies'] + solv.stats['problem']['lp']['rules']))
 
                 else:
+                    row.append(0)
                     row.append(0)
 
                     
@@ -156,6 +196,9 @@ def run_test(solver_type, problem_folder, call_extra, only_first_sol):
                 #print(check_makespan(solv.resp))
                 
                 results.write(';'.join(map(str, row)) + '\n')
+                results.flush()
+                
+            
 
             
 
@@ -190,9 +233,13 @@ def check_makespan(sol):
             
 if __name__ == '__main__':
     #print(locale.locale_alias)
-    solver_type = 0
-    problem_folder = '8x8_obs'
+    solver_type = 4
+    #problem_folder = 'grid10_20_6'
+    problem_folder = 'grid20_ag'
+    base_path = 'bases/baseH' 
     call_extra = False
     only_first_sol = True
-    run_test(solver_type, problem_folder, call_extra, only_first_sol)
+    run_test(solver_type, problem_folder, call_extra, only_first_sol, base_path)
+
+    
 

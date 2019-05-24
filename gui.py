@@ -1,9 +1,11 @@
 import sys
 import random
+import lp_generator
 from lp_generator import Problem
+import PyQt5
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import *    
+from PyQt5.QtCore import *
 
 class GUI(QMainWindow):
     
@@ -19,6 +21,7 @@ class GUI(QMainWindow):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
         self.agentsMenu = menubar.addMenu('&Agents')
+        self.agentsActions = []
 
         openMenu = QMenu('Open..', self)
         openProblem = QAction('Problem', self)
@@ -41,7 +44,7 @@ class GUI(QMainWindow):
         fileMenu.addMenu(openMenu)
         fileMenu.addAction(exitAct)
         
-        self.resize(500, 500)
+        self.resize(900, 650)
         self.setWindowTitle('MAPF')    
         self.show()
 
@@ -71,16 +74,45 @@ class GUI(QMainWindow):
 
     def makeCheckAgent(self, agent_id):
         def checkAgent():
-            self.mainFrame.changeCheckAgent(agent_id)
+            self.mainFrame.switchCheckAgent(agent_id)
         return checkAgent
 
     def addAgentsMenu(self):
+
+
         self.agentsMenu.clear()
+        self.agentsActions = []
+
         for ag in range(self.problem.num_agents):
             agAction = QAction('agent {0}'.format(ag), self, checkable=True)
             agAction.setChecked(True)
             agAction.triggered.connect(self.makeCheckAgent(ag))
+            self.agentsActions.append(agAction)
             self.agentsMenu.addAction(agAction)
+
+
+        agAllAction = QAction('Select all', self)
+        agAllAction.triggered.connect(self.selectAgents)
+        self.agentsMenu.addAction(agAllAction)
+
+        agDesAction = QAction('Deselect all', self)
+        agDesAction.triggered.connect(self.deselectAgents)
+        self.agentsMenu.addAction(agDesAction)
+
+    def selectAgents(self):
+        
+        for ag in range(self.problem.num_agents):
+            self.agentsActions[ag].setChecked(True)
+            self.mainFrame.changeCheckAgent(ag, True)
+        
+    
+    def deselectAgents(self):
+        for ag in range(self.problem.num_agents):
+            self.agentsActions[ag].setChecked(False)
+            self.mainFrame.changeCheckAgent(ag, False)
+
+
+
 
 class MainFrame(QFrame):
     def __init__(self, parent, problem):
@@ -139,8 +171,11 @@ class MainFrame(QFrame):
         self.changeMaxTime(self.problem.sol_time)
         self.mapDraw.update()
 
-    def changeCheckAgent(self, agent_id):
-        self.mapDraw.changeCheckAgent(agent_id)
+    def switchCheckAgent(self, agent_id):
+        self.mapDraw.switchCheckAgent(agent_id)
+
+    def changeCheckAgent(self, agent_id, change):
+        self.mapDraw.changeCheckAgent(agent_id, change)
 
     def changeTime(self):
         self.mapDraw.setTime(self.timeSlider.value())
@@ -149,10 +184,11 @@ class MainFrame(QFrame):
         self.timeSlider.setMaximum(time)
 
 
+
 class MapDraw(QWidget):
 
-    SquareSize = 50
-    CircleSize = 40
+    SquareSize = 60
+    CircleSize = 50
     Margin = 0
 
     def __init__(self, parent, problem):
@@ -169,6 +205,9 @@ class MapDraw(QWidget):
         self.update()
         self.time = 0
 
+        height = (self.problem.height + 1) * MapDraw.SquareSize
+        width =(self.problem.width + 1) * MapDraw.SquareSize
+
     def defineAgents(self):
         self.colorTable = []
         self.agChecked = []
@@ -179,8 +218,13 @@ class MapDraw(QWidget):
         #print(self.colorTable)
 
 
-    def changeCheckAgent(self, agent_id):
+    def switchCheckAgent(self, agent_id):
         self.agChecked[agent_id] = not self.agChecked[agent_id]
+        print(agent_id)
+        self.update()
+
+    def changeCheckAgent(self, agent_id, change):
+        self.agChecked[agent_id] = change
         self.update()
 
     def setTime(self, time):
@@ -191,6 +235,7 @@ class MapDraw(QWidget):
     def paintEvent(self, event):
         #self.resize(self.width(), self.height())
         #print(self.width(), self.height())
+
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
@@ -211,10 +256,10 @@ class MapDraw(QWidget):
                 goalY = self.problem.agents_pos[ag][2] * MapDraw.SquareSize
                 self.drawGoal(painter, goalX + MapDraw.Margin, goalY + MapDraw.Margin, ag)
 
+        for ag in range(self.problem.num_agents):
+            if self.agChecked[ag]:
                 if self.problem.solved:
                     t = min(self.time, len(self.problem.sol[ag]) - 1)
-                    #print(ag,t)
-
                     posX = self.problem.sol[ag][t][0] * MapDraw.SquareSize
                     posY = self.problem.sol[ag][t][1] * MapDraw.SquareSize
 
@@ -222,7 +267,10 @@ class MapDraw(QWidget):
                     posX = self.problem.agents_pos[ag][1] * MapDraw.SquareSize
                     posY = self.problem.agents_pos[ag][0] * MapDraw.SquareSize
 
+
+
                 self.drawAgent(painter, posX + MapDraw.Margin, posY + MapDraw.Margin, ag)
+
 
 
     def drawEmptySquare(self, painter, x, y):
@@ -245,6 +293,32 @@ class MapDraw(QWidget):
         painter.setBrush(brush)
         painter.setPen(color)
         painter.drawEllipse(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize)
+
+
+        center = MapDraw.SquareSize/2
+        fontSize = MapDraw.CircleSize/4
+        sqSize = MapDraw.SquareSize/3
+
+        
+        painter.setBrush(Qt.black)
+        painter.setPen(Qt.black)
+  
+        painter.drawRect(x + (center - sqSize/2), y + (center - sqSize/2), sqSize, sqSize)
+
+
+        font = QFont()
+        font.setPointSize(fontSize)
+
+
+
+        painter.setFont(font)
+        painter.setBrush(Qt.white)
+        painter.setPen(Qt.white)
+        painter.drawText(QRectF(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize), Qt.AlignCenter|Qt.AlignCenter, 'r{0}'.format(agent_id))
+
+        
+
+
 
     def drawGoal(self, painter, x, y, agent_id):
         dif = (MapDraw.SquareSize - MapDraw.CircleSize) / 2

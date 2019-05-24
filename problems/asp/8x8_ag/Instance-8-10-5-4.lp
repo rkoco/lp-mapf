@@ -10,23 +10,23 @@ obstacle(3,5).
 obstacle(6,5).
 
 %% Agents: 
-robot(r1).
-robot(r2).
-robot(r3).
-robot(r4).
-robot(r5).
+robot(0).
+robot(1).
+robot(2).
+robot(3).
+robot(4).
 
 %% Initial positions:: 
-on(r1,7,0,0).
-on(r2,6,3,0).
-on(r3,2,3,0).
-on(r4,4,4,0).
-on(r5,3,0,0).
+on(0,7,0,0).
+on(1,6,3,0).
+on(2,2,3,0).
+on(3,4,4,0).
+on(4,3,0,0).
 
 %% Goal positions: 
-goal(r1,0,3).
-goal(r2,5,1).
-goal(r3,4,0).
-goal(r4,1,6).
-goal(r5,6,3).
+goal(0,0,3).
+goal(1,5,1).
+goal(2,4,0).
+goal(3,1,6).
+goal(4,6,3).
 
