@@ -5,7 +5,7 @@ Multi agent pathfinding algorithm using asp/clingo
   * Input file of the problem.
   * Output file to the program in clingo.
   * Base file of the model of the problem.
-  Example: python run.py problems\original\grid20_ag\Instances\Instance-20-10-32-0 buffer bases\baseH.lp (In this version, use only baseH)
+  * Example: python run.py problems\original\grid20_ag\Instances\Instance-20-10-32-0 buffer bases\baseH.lp (In this version, use only baseH)
   
  - Also gui.py contains a graphic interface to visualize the solution. To run it just do python gui.py and do the following:
   * Click File > Open > Problem
