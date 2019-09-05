@@ -68,7 +68,7 @@ To express that no agents can be at the same vertex we use the following constra
 \begin{equation}\small\label{encoding:vertexone}
     \leftarrow at(a,x,y,t), at(a',x,y,t)
 \end{equation}
-The number of instances for this rule \eqref{encoding:vertexone} after grounding is $\Theta(|\mathcal{A}^2| \cdot |V| \cdot \mathtt{T})$. Note that this is the first rule so far whose instantiation is quadratic on the number of agents. This motivates the improvement we present later in the following section.
+The number of instances for this rule \eqref{encoding:vertexone} after grounding is $\Theta(|\mathcal{A}|^2 \cdot |V| \cdot \mathtt{T})$. Note that this is the first rule so far whose instantiation is quadratic on the number of agents. This motivates the improvement we present later in the following section.
 \subsubsection{Swap Conflicts}
 No pair of agents can swap their positions. We express this avoiding horizontal and vertical swaps using the following constraints.
 \begin{equation}\small\label{encoding:swapone}
@@ -91,4 +91,4 @@ We specify with a constraint that no agent is away from its goal at time $\matht
 \end{equation}
 The number of instances for rules \eqref{encoding:goal} is $\Theta(\mathcal{A} \cdot |V| \cdot \mathtt{T})$.
 \subsubsection{Size of Basic Encoding}
-After grounding, it follows that the size of the total encoding is in $\Theta(\mathcal{A} \cdot |V| \cdot \mathtt{T})$. That is, it is quadratic in the number of agents, linear in the size of the grid, and linear in the makespan parameter $\mathtt{T}$.
+After grounding, it follows that the size of the total encoding is in $\Theta(|\mathcal{A}|^2 \cdot |V| \cdot \mathtt{T})$. That is, it is quadratic in the number of agents, linear in the size of the grid, and linear in the makespan parameter $\mathtt{T}$.

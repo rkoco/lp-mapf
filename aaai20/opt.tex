@@ -1,70 +1,56 @@
-\section{Optimization}
-To find a cost-optimal solution, we need to encode the minimization of the number of actions executed by the agents. We tried with two different encodings.
+\section{Sum-of-Costs in ASP}
+The encoding we presented in the previous section still does not produce cost-optimal solutions. Indeed, once fed into an ASP will return a model only if a solution with makespan $\mathtt{T}$ exists. In this section we explain how we can obtain solutions for sum-of-costs MAPF.
 
-\subsection{Grid-dependent encoding}
-This encoding is similar to the approach used in MDD-SAT: the idea to minimize the actions performed by the agent at each cell. Specifically there is an atom $cost(a,t,1)$ which specifies that agent $a$ has performed an action at time $t$. To define this atom, we need to specify three rule schemas:
-\begin{enumerate}
-    \item Moving an agent from a cell that is not the goal is penalized by one unit:
-    \begin{align*} 
-    cost(A,T,1) \leftarrow &at(A,X,Y,T), \\ 
-    &not \; goal(A,X,Y).
-    \end{align*}
-    
-    
-    \item Moving an agent away from the goal is also penalized by one:
-    \begin{align*} 
-    cost(A,T,1) \leftarrow &at(A,X,Y,t), goal(A,X,Y), \\ 
-    &exec(A,M,t), m \neq wait.
-    \end{align*}
+There is a natural way to encode sum-of-costs minimization: to minimize the number of actions performed by each agent before stopping at the goal. We noticed, however, that this yields an encoding whose size grows linearly with the size of the grid, $|V|$. This motivated us to look for a more compact encoding which would not depend on $|V|$. Even though, as we see in our empirical evaluation below, the grid-independent encoding performs better in practice, we describe both approaches here since the grid-dependent encoding is more natural and is a contribution on its own since sum-of-costs had not been encoded in ASP before.
 
-    
-    \item If an agent performs a wait at the goal, but moves at a later \emph{time instant}, then is also penalized:
-    \begin{align*} 
-    cost(A,T,1) \leftarrow &at(A,X,Y,t), goal(A,X,Y), \\ 
+\subsection{Grid-Dependent Encoding}
+This encoding is similar to the approach used in MDD-SAT~\cite{SurynekFSB16}: the idea to minimize the actions performed by the agent at each cell before stopping at the goal. At a first glance one might think that we just need to count every action performed away from the goal and minimize this number. This approach, however does not work because a \Wait at the goal at time $t$ \emph{should} be counted if the agent will move away from the goal at some instant $t'$ greater than $t$.
+
+To identify time instants at which we know the agent will not move away from the goal, we introduce the predicate $at\_goal\_back(a,t)$, which specifies that agent $a$ has reached the goal at time $t$  and will not move away in the future:
+\begin{eqnarray*}\small
+    at\_goal\_back(A,\mathtt{T}) &\leftarrow& agent(A), \\
+    at\_goal\_back(A,T-1) &\leftarrow &at\_goal\_back(A,T),\\
+    &&exec(A,wait,T-1).
+  \end{eqnarray*}
+
+Now we define predicate $cost$, such that thre is an atom of the form $cost(a,t,1)$ in the model whenever agent $a$ performes an action at time $t$ before stopping at the goal. First we express that moving an agent from a cell that is not the goal is penalized by one unit:
+\begin{equation*}\small
+cost(A,T,1) \leftarrow at(A,X,Y,T), not \; goal(A,X,Y).
+\end{equation*}
+Second, moving an agent away from the goal is also penalized by one:
+\begin{equation*}\small
+  \begin{split}
+    cost(A,T,1) \leftarrow &at(A,X,Y,t), goal(A,X,Y), \\
+    &exec(A,M,t), M \neq \Wait.
+  \end{split}
+  \end{equation*}
+
+Third, if an agent performs a \Wait at the goal, but moves at a later time instant, then this is also penalized:
+\begin{equation*}\small
+  \begin{split}
+    cost(A,T,1) \leftarrow &at(A,X,Y,t), goal(A,X,Y), \\
     &exec(A,wait,T), not \; at\_goal\_back(A,T).
-    \end{align*}
-
-    
-    Where $at\_goal\_back(a,t)$ specify that the agent $a$ at time $t$ has reached the goal and will not move away in the future. This is defined by the following rules:
-    \begin{align*} 
-    at\_goal\_back(A,\mathtt{T}) \leftarrow &agent(A). \\ 
-    at\_goal\_back(A,T-1) \leftarrow &at\_goal\_back(A,T),\\ 
-    &exec(A,wait,T-1).
-    \end{align*}
-
-    
-    
-    
-\end{enumerate}
-$\Theta(|V| \times \mathtt{T})$
-
-The resulting number of rules and constraints grows linearly with the size of the grid and the number of agents.
+  \end{split}
+  \end{equation*}
 
 
 Finally, via an optimization statement, we minimize the number of atoms of the form $cost(A,T,1)$ in the model:
 \[ \#minimize \{C,T,A : cost(A,T,C)\}.\]
 
+After grounding the number of rules is in $\Theta(|\mathcal{A}|\cdot|V| \cdot \mathtt{T})$.
 
-\subsection{Grid-independent encoding}
-For this encoding, we define the atom $optimal(A, C)$, which specifies the cost of the optimal path of the agent $A$ ignoring the conflict constraint of the problem. This can be easily pre-computed via the Dijkstra algorithm for each agent separately.
+\subsection{Grid-Independent Encoding}
+For this encoding, we define the atom $optimal(a, c_a)$, for each agent $a\in \mathcal{A}$, where $c_a$ corresponds to the cost of the optimal path from $init(a)$ to $goal(a)$ ignoring both vertex and swap conflicts. Essentially $c_a$ is the result of solving a relaxation of the problem that ignores other agents. We compute such a value using Dijkstra's algorithm, before generating the encoding.
 
-
-
-In contrast to the first encoding, we maximize the slack between the makespan $T$ and the time instant at which an agent has stopped at the goal.We define the atom.
-
-
-
-\begin{align*} 
-    penalty(A,T,1) \leftarrow &optimal(A,C), T > C \\ 
+In contrast to the first encoding, we maximize the slack between the makespan $T$ and the time instant at which an agent has stopped at the goal, by simply adding:
+\begin{equation*}\small
+  \begin{split}
+    penalty(A,T,1) \leftarrow &optimal(A,C), T > C, \\
     &at\_goal\_back(A,T-1).
-\end{align*}
+\end{split}
+\end{equation*}
 
-$\Theta(A \times \mathtt{T})$ The rule defining these atom doesn't make reference to the cells in the grid, resulting in an encoding that does not depend on the grid, and thus is linear in the number of agents. We add the optimization statement:
+Note that since no reference to the grid cells is made, the grounding generates a number of rules in $\Theta(|\mathcal{A}|\cdot\mathtt{T})$. Finally, we use the following maximization statement.
+\[ \small \#maximize \{P,T,A : penalty(A,T,P)\}.\]
 
-\[ \#maximize \{P,T,A : penalty(A,T,P)\}.\]
-
-Finally, the cost of the solution is $C = \mathtt{T} \times A - penalty $
-
-
-
-
+%Finally, the cost of the solution is $C = \mathtt{T} \times A - penalty $
