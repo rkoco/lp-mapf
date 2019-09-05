@@ -5,3 +5,5 @@
 *.log
 main.pdf
 *.out
+*.synctex.gz
+*.fdb_latexmk
