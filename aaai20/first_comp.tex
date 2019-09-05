@@ -66,7 +66,7 @@ The total number of grounded rules for the rules of form \eqref{encoding:legal} 
 \subsubsection{Vertex Conflicts}
 To express that no agents can be at the same vertex we use the following constraint, which is similar to those used in the encoding to ASP by \acite{ErdemKOS13} and \acite{SurynekFSB16} \textbf{revisar si es la cita correcta a Surynek}.
 \begin{equation}\small\label{encoding:vertexone}
-    \leftarrow at(a,x,y,t), at(a',x,y,t)
+    \leftarrow at(A,X,Y,T), at(A',X,Y,T)
 \end{equation}
 The number of instances for this rule \eqref{encoding:vertexone} after grounding is $\Theta(|\mathcal{A}|^2 \cdot |V| \cdot \mathtt{T})$. Note that this is the first rule so far whose instantiation is quadratic on the number of agents. This motivates the improvement we present later in the following section.
 \subsubsection{Swap Conflicts}
@@ -85,8 +85,8 @@ The number of ground rules for \eqref{encoding:swapone} is in $\Theta(|\mathcal{
 We specify with a constraint that no agent is away from its goal at time $\mathtt{T}$:
 \begin{equation}\small\label{encoding:goal}
   \begin{split}
-&at\_goal(a,t) \leftarrow at(a,x,y,t), goal(a,x,y),\\
-&\leftarrow agent(a), not \; at\_goal(a,\mathtt{T}).
+&at\_goal(A,T) \leftarrow at(A,X,Y,T), goal(A,X,Y),\\
+&\leftarrow agent(A), not \; at\_goal(A,\mathtt{T}).
 \end{split}
 \end{equation}
 The number of instances for rules \eqref{encoding:goal} is $\Theta(\mathcal{A} \cdot |V| \cdot \mathtt{T})$.

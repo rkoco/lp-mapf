@@ -1,28 +1,31 @@
-\section{A linear encoding for conflicts}
-We introduce the following atoms:
+\section{A Linear Encoding}
+The encoding we have proposed is quadratic in the number of agents. In this section we show how to make it linear by introducing new atoms to the encoding. Specifically, we introduce the following atoms:
 \begin{itemize}
-    \item $rt(X,Y,T)$, which specify that the edge between $(X,Y)$ and $(X,Y+1)$ is traversed by some agent at time $T$.
-    \item $lt(X,Y,T),ut(X,Y,T),dt(X,Y,T)$ analogous to the atoms defined above, for the $\Up$ and $\Down$ moves, respectively.
-    \item $st(X,Y,T)$, indicates that an agent at $(X,Y)$ performed a wait action at time $T$.
+    \item $rt(x,y,t)$ (resp.\ $lt(x,y,t)$) which specifies that the edge between $(x,y)$ and $(x,y+1)$ was traversed by \emph{some} agent at time $t$ from left to right (resp.\ from right to left).
+    \item $ut(x,y,t)$ (resp.\ $dt(x,y,t)$) which specifies that the edge between $(x,y)$ and $(x,y+1)$ was traversed upwards (resp.\ downwards) by some agent at time $t$.
+    \item $st(x,y,t)$, indicates that some agent stayed at $(x,y)$, that is, it  performed a wait action at time $t$.
 \end{itemize}
 
-The dynamics of these atoms are defined using basic rules like:
-\[lt(X,Y,T) \leftarrow exec(A,right,T), at(X,Y,T)\]
-for every agent $a$, cell $(x,y)$, and time instant $t$. Their definition is thus linear in the number of agents and the size of the grid.
-$\Theta( |\mathcal{A}| \times |V| \times \mathtt{T})$
+The dynamics of these atoms are defined using one rule with variables. The rule for $rt$ is:
+\begin{equation}\small\label{encoding:rt}
+  rt(X,Y,T) \leftarrow exec(A,right,T), at(A,X,Y,T),
+\end{equation}
+while the rule for $st$ is:
+{\small\begin{equation*}
+  st(X,Y,T) \leftarrow at(A,X,Y,T), exec(A,wait,T).
+\end{equation*}}
+We omit the rules for $dt$, $lt$, and $ut$ since they are analogous to \eqref{encoding:rt}.
 
-Finally, we can represent conflicts restrictions with constraints, for instance the next constraint represents a horizontal swap restriction
-\[\leftarrow rt(X,Y,T),lt(X+1,Y,T)\]
-
-The resulting number of constraints and rules is linear in the size of the map.
-
-$\Theta(|V| \times \mathtt{T})$ (* 4) por cada edge posible
-
-\section{Bounding the effect positions}
-We change the basic effect rules to include a bound on the positions of the agents:
+Using these predicates we now express the fact that a single cell cannot be entered at the same time instant by two different agents. This requires six rules each of which corresponds to a pairs of actions in $\{\Right,\Left,\Up,\Down\}$. For example, the following rule expresses that $(X,Y)$ cannot be entered by an agent performing a \Down action at the same time that is entered by another agent performing  \Up:
+{\small\begin{equation*}
+  \leftarrow lt(X,Y,T), dt(X,Y,T)
+\end{equation*}}
+It is easy to verify that these rules do not mention pairs of different agents, unlike \eqref{encoding:vertexone} and \eqref{encoding:swapone}, and as such after grounding we end with $\Theta(|\mathcal{A}|\cdot|V|\cdot\mathtt{T})$ rules, and therefore the resulting encoding is linear in $|\mathcal{A}|$.
+%\section{Bounding the effect positions}
+%We change the basic effect rules to include a bound on the positions of the agents:
 %\begin{align*}
 %    \at(A,X,Y,T) \leftarrow &at(A,X',Y',t), exec(A,M,T), \cup B, \\
 %    &cost\_to\_go(A,X,Y,C), T + C <= \mathtt{T}
 %\end{align*}
 
-Where $cost\_to\_go(A,X,Y,C)$ specify that $C$ is the minimum distance from the position $(X,Y)$ to the goal of agent $A$. This way we can ignore the generation of rules to positions that will not reach the goal.
+%Where $cost\_to\_go(A,X,Y,C)$ specify that $C$ is the minimum distance from the position $(X,Y)$ to the goal of agent $A$. This way we can ignore the generation of rules to positions that will not reach the goal.

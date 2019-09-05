@@ -40,7 +40,7 @@ Finally, via an optimization statement, we minimize the number of atoms of the f
 After grounding the number of rules is in $\Theta(|\mathcal{A}|\cdot|V| \cdot \mathtt{T})$.
 
 \subsection{Grid-Independent Encoding}
-For this encoding, we define the atom $optimal(a, c_a)$, for each agent $a\in \mathcal{A}$, where $c_a$ corresponds to the cost of the optimal path from $init(a)$ to $goal(a)$ ignoring both vertex and swap conflicts. Essentially $c_a$ is the result of solving a relaxation of the problem that ignores other agents. We compute such a value using Dijkstra's algorithm, before generating the encoding.
+For this encoding, we define the atom $optimal(a, c_a)$, for each agent $a\in \mathcal{A}$, where $c_a$ corresponds to the cost of the optimal path from $init(a)$ to $goal(a)$ ignoring both vertex and swap conflicts. In other words, $c_a$ is the result of solving a relaxation of the problem that ignores other agents. We compute such a value using Dijkstra's algorithm, before generating the encoding.
 
 In contrast to the first encoding, we maximize the slack between the makespan $T$ and the time instant at which an agent has stopped at the goal, by simply adding:
 \begin{equation*}\small
@@ -51,6 +51,6 @@ In contrast to the first encoding, we maximize the slack between the makespan $T
 \end{equation*}
 
 Note that since no reference to the grid cells is made, the grounding generates a number of rules in $\Theta(|\mathcal{A}|\cdot\mathtt{T})$. Finally, we use the following maximization statement.
-\[ \small \#maximize \{P,T,A : penalty(A,T,P)\}.\]
+{\small\[ \small \#maximize \{P,T,A : penalty(A,T,P)\}.\]}
 
 %Finally, the cost of the solution is $C = \mathtt{T} \times A - penalty $

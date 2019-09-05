@@ -29,7 +29,7 @@ Second, let $sol_{min}$ be the solution that is found first. Unfortunately, $sol
 \begin{theorem}[\nbcite{SurynekFSB16}]\label{thm:optimal}
 Let $sol_{min}$ be the makespan-optimal solution for MAPF problem $P$, let $sol^-$ denote a solution to $P$ that ignores all conflicts, and let $\mathtt{T}^-$ denote its makespan. Then the makespan of the cost-optimal solution is at most at $\mathtt{T}_{max}=\mathtt{T}^- + c(sol_{min})-c(sol^-)-1$.
 \end{theorem}
-Thus after we find the first solution $sol_{min}$, we run the solver again for makespan $\mathtt{T}_{max}$ given by Theorem~\ref{thm:optimal}.
+Thus after we find the first solution $sol_{min}$, we run the solver again for makespan $\mathtt{T}_{max}$ given by Theorem~\ref{thm:optimal}. The approach described in this section was recently evaluated by \acite{BartakS19} for their Picat-based MAPF solver.
 
 
 %First we calculate the shortest path for each agent ignoring the conflicts with other agents. The maximum cost and sum of costs of these paths provide a lower bound for the makespan $\mathtt{T}_{min}$ and \emph{sum-of-costs} respectively. Then we define and start solving an ASP program with one of the encodings defined before using $\mathtt{T}=\mathtt{T}_{min}$ as the makespan. If there's no solution we increase $\mathtt{T}$ by 1 and repeat the process.
@@ -41,21 +41,21 @@ Thus after we find the first solution $sol_{min}$, we run the solver again for m
 %So we run the program one last time using $\mathtt{T}=C(M) - 1 - C^-$ and return that solution.
 
 
- \begin{algorithm}
- \DontPrintSemicolon
- \KwIn{A MAPF problem}
- $\mathtt{T} \gets \max\limits_{i=\{1..K\} }{c^*(a_i)}$\;
- $C^- \gets \sum_{\substack{i=1}}^{k} c^*(a_i)$\;
- $P(\mathtt{T}) \gets$ Create an ASP program from input problem with makespan T\;% $M \gets \{\}$\;
-  \While{$M$ is empty}{
-   $M \gets$ Solve $P(T)$\;
-   \If{$M$ is not empty}{
-     $C(M) \gets$ cost of the solution of model $M$\;
-     $\Delta \gets C(M) - 1 - C^-$\;
-     $M^* \gets$ Solve $P(\mathtt{T}+\Delta)$\;
-     \Return{M}\;
-   }
-   $\mathtt{T} \gets \mathtt{T}+1$\;
- }
+% \begin{algorithm}
+% \DontPrintSemicolon
+% \KwIn{A MAPF problem}
+% $\mathtt{T} \gets \max\limits_{i=\{1..K\} }{c^*(a_i)}$\;
+% $C^- \gets \sum_{\substack{i=1}}^{k} c^*(a_i)$\;
+% $P(\mathtt{T}) \gets$ Create an ASP program from input problem with makespan T\;% $M \gets \{\}$\;
+%  \While{$M$ is empty}{%
+%   $M \gets$ Solve $P(T)$\;
+%   \If{$M$ is not empty}{
+%     $C(M) \gets$ cost of the solution of model $M$\;
+%     $\Delta \gets C(M) - 1 - C^-$\;
+%     $M^* \gets$ Solve $P(\mathtt{T}+\Delta)$\;
+%     \Return{M}\;
+%   }
+%   $\mathtt{T} \gets \mathtt{T}+1$\;
+ %}
 
-\end{algorithm}
+%\end{algorithm}
