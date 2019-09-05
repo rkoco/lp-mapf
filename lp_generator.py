@@ -1,6 +1,7 @@
 import os
 import clingo
 import asp_solver
+import json
 
 class Problem:
     def __init__(self, time):
@@ -13,6 +14,7 @@ class Problem:
         self.time = time
         self.max_distance = -1
         self.heuristic = []
+        self.heuristic_initial = []
         self.best_dirs = []
 
         self.dirX = [1,0,-1,0]
@@ -59,17 +61,22 @@ class Problem:
             self.num_agents = int(in_file.readline())
             for a in range(self.num_agents):
                 agent_map = []
+                agent_map_init = []
                 agent_dirs = []
                 for y in range(self.height):
                     agent_row = []
+                    agent_row_init = []
                     row_dirs = []
                     for x in range(self.width):
                         agent_row.append(-1) #infty heuristic (not defined)
+                        agent_row_init.append(-1)
                         row_dirs.append([])
                     agent_map.append(agent_row)
+                    agent_map_init.append(agent_row_init)
                     agent_dirs.append(row_dirs)
 
                 self.heuristic.append(agent_map)
+                self.heuristic_initial.append(agent_map_init)
                 self.best_dirs.append(agent_dirs)
 
                 line = in_file.readline().split(',')
@@ -108,23 +115,58 @@ class Problem:
             #Put heuristics (and best dirs) for each agent for each cell
             for i in range(self.num_agents):
                 agent_map = []
+                agent_map_init = []
                 agent_dirs = []
                 for y in range(self.height):
                     agent_row = []
+                    agent_row_init = []
                     row_dirs = []
                     for x in range(self.width):
                         agent_row.append(-1) #infty heuristic (not defined)
+                        agent_row_init.append(-1)
                         row_dirs.append([])
                     agent_map.append(agent_row)
+                    agent_map_init.append(agent_row_init)
                     agent_dirs.append(row_dirs)
 
                 self.heuristic.append(agent_map)
+                self.heuristic_initial.append(agent_map_init)
                 self.best_dirs.append(agent_dirs)
 
             for l in in_file.readlines():
                 line = l.split(',')
                 pos = (int(line[0]),int(line[1]),int(line[2]),int(line[3]))
                 self.agents_pos.append(pos)
+
+    def dijkstra_init(self, ag_id):
+        posY = self.agents_pos[ag_id][0]
+        posX = self.agents_pos[ag_id][1]
+
+        obj = (posY, posX)
+        open_list = []
+        open_list.append(obj)
+        self.heuristic_initial[ag_id][posY][posX] = 0
+        while True:
+            if not open_list:
+                break
+            u = open_list.pop(0)
+            #print(u)
+            ux = u[1]
+            uy = u[0]
+
+            #Succesors
+            for i in range(4):
+                vx = ux + self.dirX[i]
+                vy = uy + self.dirY[i]
+                #Check if pos is valid:
+                if vx < self.width and vx >= 0 and vy < self.height and vy >= 0 and self.map[vy][vx] != 1:
+                    v_cost = self.heuristic_initial[ag_id][uy][ux] + 1
+                    gv = self.heuristic_initial[ag_id][vy][vx]
+                    if gv == -1 or v_cost < gv:
+                        self.heuristic_initial[ag_id][vy][vx] = v_cost
+                        #reset the list, there is a better path
+                        open_list.append((vy,vx))
+
 
     def solve_agent(self, ag_id):
         posY = self.agents_pos[ag_id][2]
@@ -186,8 +228,13 @@ class Problem:
         self.max_time = 0
         self.min_sum = 0
         for ag in range(self.num_agents):
+            #print('solving for ag', ag)
             self.solve_agent(ag)
+            self.dijkstra_init(ag)
             self.agent_cost.append(0)
+
+        #for ag in range(self.num_agents):
+            #self.dijkstra_init(ag)
 
         for ag in range(self.num_agents):
             posY = self.agents_pos[ag][0]
@@ -252,20 +299,56 @@ class Problem:
             #write the agents:
             out_file.write('%% Agents: \n')
             for ag in range(self.num_agents):
-                out_file.write('robot(r{0}).\n'.format(ag+1))
+                out_file.write('robot({0}).\n'.format(ag))
             out_file.write('\n')
 
             #initial positions:
+            '''
             out_file.write('%% Initial positions:: \n')
             for ag in range(self.num_agents):
-                out_file.write('on(r{0},{1},{2},0).\n'.format(ag+1, self.agents_pos[ag][1], self.agents_pos[ag][0]))
+                out_file.write('init(r{0},{1},{2}).\n'.format(ag+1, self.agents_pos[ag][1], self.agents_pos[ag][0]))
             out_file.write('\n')
+            '''
+            
+            out_file.write('%% Initial positions:: \n')
+            for ag in range(self.num_agents):
+                out_file.write('on({0},{1},{2},0).\n'.format(ag, self.agents_pos[ag][1], self.agents_pos[ag][0]))
+            out_file.write('\n')
+            
+
+
 
             #goal positions:
             out_file.write('%% Goal positions: \n')
             for ag in range(self.num_agents):
-                out_file.write('goal(r{0},{1},{2}).\n'.format(ag+1, self.agents_pos[ag][3], self.agents_pos[ag][2]))
+                out_file.write('goal({0},{1},{2}).\n'.format(ag, self.agents_pos[ag][3], self.agents_pos[ag][2]))
             out_file.write('\n')
+
+
+            #dijkstra values
+            
+            
+            for ag in range(self.num_agents):
+                h_val = self.heuristic[ag][self.agents_pos[ag][0]][self.agents_pos[ag][1]]
+                out_file.write('dijkstra({0},{1}).\n'.format(ag, h_val))
+            out_file.write('\n\n')
+            
+            
+
+            #min cost
+            
+            for ag in range(self.num_agents):
+                for y in range(self.height):
+                    for x in range(self.width):
+                        h1 = self.heuristic[ag][y][x]
+                        #h2 = self.heuristic_initial[ag][y][x]
+                        if h1 != -1:
+                            out_file.write('cost_to_go({0},{1},{2},{3}).\n'.format(ag, x, y, h1))
+                out_file.write('\n\n')
+            
+            
+            
+            
 
             #Heuristic for each agent:
             
@@ -286,9 +369,11 @@ class Problem:
                     for x in range(self.width):
                         dirs = self.best_dirs[ag][y][x]
                         for d in dirs:
-                            out_file.write('best_action(r{0},{1},{2},{3}).\n'.format(ag+1, x, y, d))
+                            out_file.write('best_action({0},{1},{2},{3}).\n'.format(ag, x, y, d))
                 out_file.write('\n\n')
-            '''
+                '''
+            
+            
 
             #Base info for the grid world in lp
             '''
@@ -353,11 +438,150 @@ class Problem:
 
                 sol_cost += 1
 
-        print(sol_cost)
-
+        print(solv.sol_cost)
 
     def clingo_solve(self, inp):
-        solv = asp_solver.IncrementalSolver(inp, self.max_time, self.num_agents, self.min_sum, self.total_cost, 0)
-        clingo.clingo_main(solv, [inp, '-t', '4'])
+        print('solving with clingo...')
+        num = self.max_time
+        while True:
+            solv = asp_solver.IncrementalSolver(inp, num, self.num_agents, self.min_sum, self.total_cost, 4, True)
+            clingo.clingo_main(solv, [inp, 'bases/baseH.lp','--opt-strat=usc,disjoint' ,'--outf=3' , '--time-limit=300', '-c','bound={0}'.format(num)])
+            if solv.sol_cost > 0:
+                ms = int(solv.theoric_makespan)
+                break
+                if ms > num:
+                    num = ms
+                    solv = asp_solver.IncrementalSolver(inp, num, self.num_agents, self.min_sum, self.total_cost, 4, True)
+                    clingo.clingo_main(solv, [inp, 'bases/baseH.lp','--opt-strat=usc,disjoint' ,'--outf=3' , '--time-limit=300', '-c','bound={0}'.format(num)])
+                break
+            num += 1
+
         self.sol = solv.resp
-        self.sol_time = solv.makespan
+        self.check_makespan()
+        print('-----------------')
+        print('Estadisticas Clingo:')
+        print(json.dumps(solv.stats, sort_keys=True, indent=4, separators=(',', ': ')))
+        print('Encontrada Solucion') 
+        print('\tCosto total: {0}'.format(solv.sol_cost))
+        print('\tMakespan: {0}'.format(self.sol_time))
+        print('-----------------')
+        
+
+    def check_makespan(self):
+        makespan = -1
+        for ag in self.sol:
+            last_x = -1
+            last_y = -1
+            step = 0
+            wait_on_goal = 0
+            for pos in ag:
+                if last_x == pos[0] and last_y == pos[1]:
+                    wait_on_goal += 1
+                else:
+                    wait_on_goal = 0
+
+                last_x = pos[0]
+                last_y = pos[1]
+
+                step+=1
+
+            ag_makespan = step - wait_on_goal
+            if ag_makespan > makespan:
+                makespan = ag_makespan
+
+        #print(makespan)
+        self.sol_time = makespan - 1
+
+
+    def write_to_surynek(self, outp):
+        with open('{0}.cpf'.format(outp), 'w') as out_file:
+            out_file.write('V=\n')
+            v_id = 0
+            num_obs = 0
+
+            map_ids = []
+
+            for y in range(self.height):
+                map_row = []
+                for x in range(self.width):
+                    extra = [0,0]
+                    for ag in range(self.num_agents):
+                        if self.agents_pos[ag][0] == y and self.agents_pos[ag][1] == x:
+                            extra[0] = ag+1
+
+                        if self.agents_pos[ag][2] == y and self.agents_pos[ag][3] == x:
+                            extra[1] = ag+1
+
+                    cell = self.map[y][x]
+                    if cell != 1:
+                        out_file.write('({0}:-1)[{1}:{2}:{2}]\n'.format(v_id,extra[0],extra[1]))
+                        map_row.append(v_id)
+                        v_id +=1
+
+                    else:
+                        num_obs += 1
+                        map_row.append(-1)
+
+                map_ids.append(map_row)
+            print(num_obs)
+
+            out_file.write('E=\n')
+            for y in range(self.height):
+                for x in range(self.width):
+                    cell_id = map_ids[y][x]
+                    if cell_id != -1:
+                        if y + 1 < self.height and map_ids[y+1][x] != -1:
+                            out_file.write('{{{0},{1}}} (-1)\n'.format(cell_id, map_ids[y+1][x]))
+                        
+                        if x + 1 < self.width and map_ids[y][x+1] != -1:
+                            out_file.write('{{{0},{1}}} (-1)\n'.format(cell_id, map_ids[y][x+1]))
+    
+    def write_to_surynek2(self, outp):
+        with open('{0}.cpf'.format(outp), 'w') as out_file:
+            out_file.write('V=\n')
+            v_id = 0
+            num_obs = 0
+
+            map_ids = []
+
+            for y in range(self.height):
+                map_row = []
+                for x in range(self.width):
+                    extra = [0,0]
+                    for ag in range(self.num_agents):
+                        if self.agents_pos[ag][0] == y and self.agents_pos[ag][1] == x:
+                            extra[0] = ag+1
+
+                        if self.agents_pos[ag][2] == y and self.agents_pos[ag][3] == x:
+                            extra[1] = ag+1
+
+                    cell = self.map[y][x]
+                    if cell != 1:
+                        out_file.write('({0}:-1)[{1}:0:{2}]\n'.format(v_id,extra[0],extra[1]))
+                        map_row.append(v_id)
+                        v_id +=1
+
+                    else:
+                        num_obs += 1
+                        map_row.append(-1)
+
+                map_ids.append(map_row)
+            print(num_obs)
+
+            out_file.write('E=\n')
+            for y in range(self.height):
+                for x in range(self.width):
+                    cell_id = map_ids[y][x]
+                    if cell_id != -1:
+                        if y + 1 < self.height and map_ids[y+1][x] != -1:
+                            out_file.write('{{{0},{1}}} (-1)\n'.format(cell_id, map_ids[y+1][x]))
+                            out_file.write('{{{1},{0}}} (-1)\n'.format(cell_id, map_ids[y+1][x]))
+                        
+                        if x + 1 < self.width and map_ids[y][x+1] != -1:
+                            out_file.write('{{{0},{1}}} (-1)\n'.format(cell_id, map_ids[y][x+1]))
+                            out_file.write('{{{1},{0}}} (-1)\n'.format(cell_id, map_ids[y][x+1]))
+    
+
+
+
+

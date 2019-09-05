@@ -1,2 +1,4 @@
 clingo/
 __pycache__/
+results/
+examples/
