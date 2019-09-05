@@ -64,7 +64,7 @@ We need to express that the agents move through the vertices in the graph; that 
 The total number of grounded rules for the rules of form \eqref{encoding:legal} is in $\Theta(|\mathcal{A}| \cdot |V| \cdot \mathtt{T})$, since it depends on the number of atoms of the form $at$, $obstacle$, $rangeX$, and $rangeY$.
 
 \subsubsection{Vertex Conflicts}
-To express that no agents can be at the same vertex we use the following constraint, which is similar to those used in the encoding to ASP by \acite{ErdemKOS13} and \acite{SurynekFSB16} \textbf{revisar si es la cita correcta a Surynek}.
+To express that no agents can be at the same vertex we use the following constraint, which is similar to those used in the encodings to ASP by \acite{ErdemKOS13,GebserOOS18} and \acite{SurynekFSB16}.
 \begin{equation}\small\label{encoding:vertexone}
     \leftarrow at(A,X,Y,T), at(A',X,Y,T)
 \end{equation}
