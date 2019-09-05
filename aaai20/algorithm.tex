@@ -1,0 +1,52 @@
+%\section{Makespan as a Bound}
+% To guarantee that our model will yield a solution that is \emph{sum-of-costs} optimal we need to provide a maximum $makespan$ $T$ big enough. 
+
+% In figure , we show an example where the increase of the \emph{makespan} returns better \emph{sum-of-costs} solutions. The problem has 3 agents:  $a_1$ needs to go from $(0,1)$ to $(3,1)$. The agents $a_2$ and $a_3$ are already at the goal on the positions $(1,1)$ and $(2,1)$ respectively. We compare the minimum \emph{sum-of-costs} solution with two different \emph{makespans}:
+
+% \begin{itemize}
+%     \item $\mu=3$. The optimal \emph{sum-of-costs} solution involves moving $a_2$ and $a_3$ out of their goal. The costs for each agent are: $cost(a_1) = 3$, $cost(a_2) = 2$ and $cost(a_3) = 3$, which gives us \emph{sum-of-costs} $=8$.
+%     \item $\mu=5$. The optimal \emph{sum-of-costs} solution only needs to move $a_1$, dodging the locations occupied by the other agents: \emph{sum-of-costs} $=cost(a_1) = 5$
+% \end{itemize}
+
+
+
+% \emph{makespan} $m_{opt}$ that guarantees a cost-optimal solution given an initial solution.
+
+% \begin{lemma}
+% Given an initial solution with cost $\sigma$. We can bound $m_{opt}$ as:
+% \[
+%     m_{opt} \leq  \sigma - \min\limits_{i=\{1..k\} }{\sum_{\substack{j=1 \\ j \neq i}}^{k} c^*(a_j)}
+% \]
+% Where $c^*(a_j)$ is the optimal cost of the path $a_j$ ignoring the conflicts with other agents.
+% \end{lemma}
+
+\section{Algorithm}
+First we calculate the shortest path for each agent ignoring the conflicts with other agents. The maximum cost and sum of costs of these paths provide a lower bound for the makespan $\mathtt{T}_{min}$ and \emph{sum-of-costs} respectively. Then we define and start solving an ASP program with one of the encodings defined before using $\mathtt{T}=\mathtt{T}_{min}$ as the makespan. If there's no solution we increase $\mathtt{T}$ by 1 and repeat the process.
+
+If the program returns a valid solution then as it was shown in Figure ~\ref{fig:makespancost} it's not guaranteed that is \emph{sum-of-cost} optimal. 
+
+The using (bartak)
+
+So we run the program one last time using $\mathtt{T}=C(M) - 1 - C^-$ and return that solution.
+
+
+\begin{algorithm}
+\DontPrintSemicolon
+\KwIn{A MAPF problem}
+$\mathtt{T} \gets \max\limits_{i=\{1..K\} }{c^*(a_i)}$\;
+$C^- \gets \sum_{\substack{i=1}}^{k} c^*(a_i)$\;
+$P(\mathtt{T}) \gets$ Create an ASP program from input problem with makespan T\;
+$M \gets \{\}$\;
+\While{$M$ is empty}{
+  $M \gets$ Solve $P(T)$\;
+  \If{$M$ is not empty}{
+    $C(M) \gets$ cost of the solution of model $M$\;
+    $\Delta \gets C(M) - 1 - C^-$\;
+    $M^* \gets$ Solve $P(\mathtt{T}+\Delta)$\;
+    \Return{M}\;
+  }
+  $\mathtt{T} \gets \mathtt{T}+1$\;
+}
+
+\end{algorithm}
+

@@ -1,0 +1,28 @@
+\section{A linear encoding for conflicts}
+We introduce the following atoms:
+\begin{itemize}
+    \item $rt(X,Y,T)$, which specify that the edge between $(X,Y)$ and $(X,Y+1)$ is traversed by some agent at time $T$.
+    \item $lt(X,Y,T),ut(X,Y,T),dt(X,Y,T)$ analogous to the atoms defined above, for the $\Up$ and $\Down$ moves, respectively.
+    \item $st(X,Y,T)$, indicates that an agent at $(X,Y)$ performed a wait action at time $T$.
+\end{itemize}
+
+The dynamics of these atoms are defined using basic rules like:
+\[lt(X,Y,T) \leftarrow exec(A,right,T), at(X,Y,T)\]
+for every agent $a$, cell $(x,y)$, and time instant $t$. Their definition is thus linear in the number of agents and the size of the grid.
+$\Theta( |\mathcal{A}| \times |V| \times \mathtt{T})$
+
+Finally, we can represent conflicts restrictions with constraints, for instance the next constraint represents a horizontal swap restriction
+\[\leftarrow rt(X,Y,T),lt(X+1,Y,T)\]
+
+The resulting number of constraints and rules is linear in the size of the map.
+
+$\Theta(|V| \times \mathtt{T})$ (* 4) por cada edge posible
+
+\section{Bounding the effect positions}
+We change the basic effect rules to include a bound on the positions of the agents:
+%\begin{align*}
+%    \at(A,X,Y,T) \leftarrow &at(A,X',Y',t), exec(A,M,T), \cup B, \\
+%    &cost\_to\_go(A,X,Y,C), T + C <= \mathtt{T}
+%\end{align*}
+
+Where $cost\_to\_go(A,X,Y,C)$ specify that $C$ is the minimum distance from the position $(X,Y)$ to the goal of agent $A$. This way we can ignore the generation of rules to positions that will not reach the goal.

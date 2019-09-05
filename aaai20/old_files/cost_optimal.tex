@@ -1,0 +1,12 @@
+\section{Cost-Optimal MAPF to ASP Given a Makespan}
+In this section we describe two cost-optimal encodings for MAPF to ASP for a given makespan $m$. As such, when given to an ASP solver, they will generate a cost-optimal solution which does not exceed makespan $m$. In the next section, we show that these solutions are not necessarily truly cost-optimal. For now however, we focus on this simpler case to ease our presentation.
+
+The first is a straightforward encoding that states that each time the agent performs an action away from the goal state, then $penalty(R,t,1)$ holds true.
+
+\begin{align*}
+penalty(R,t,1) \leftarrow &at(R,X,Y,t), not\: goal(R,X,Y). \\
+penalty(R,t,1) \leftarrow &at(R,X,Y,t), goal(R,X,Y), exec(R,A,t),A!=wait. \\
+penalty(R,t,1) \leftarrow &goal(R,X,Y), at(R,X,Y,t), exec(R,wait,t), not\: at\_goal\_back(R,t). \\
+at\_goal\_back(R,m) \leftarrow &robot(R). \\
+at\_goal\_back(R,T-1) \leftarrow &tiempo(t),at\_goal\_back(R,t),exec(R,wait,t-1). 
+\end{align*}

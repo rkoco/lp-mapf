@@ -1,0 +1,94 @@
+\section{A Basic Translation of MAPF to ASP}
+We are now ready to describe our compilation of sum-of-costs MAPF to ASP. As we have mentioned above, this is the first compilation to ASP that handles sum-of-costs. Besides that aspect of novelty, the basic compilation that we present here is similar in many aspects to \citeauthor{ErdemKOS13}'s compilation \shortcite{ErdemKOS13} to ASP, and, in some aspects simlar to the MAPF-to-SAT compilation of \acite{Surynek14}. Below we are specific about these similarities.
+
+As most compilations of planning problems into SAT/ASP, the makespan of the compilation is a parameter, which below we call $\mathtt{T}$.
+%\begin{itemize}
+%    \item $a$ refers to an agent.
+%    \item $x,y$ refers to a position in the grid.
+%    \item $m$ indicates a move or action. Where $m \in \{up,down,left,right,wait\}$.
+%\end{itemize}
+
+\subsubsection{Atoms}
+We use the following atoms:
+\begin{itemize}
+\item $agent(a)$: to express that $A$ is an agent,
+\item $goal(a,x,y)$: specifies that the goal cell for agent $a$ is $(x,y)$,
+\item $obstacle(x,y)$: specifies that cell $(x,y)$ is an obstacle,
+\item $at(a,x,y,t)$: specifies that agent $a$ is at $(x,y)$ at time $t$,
+\item $exec(a,m,t)$: specifies that agent $a$ executes move $m$ at time $t$,
+\item $at\_goal(a,t)$: specifies that agent $a$ is at the goal at time $t$,
+\item $time(t)$: $t$ is a time instant,
+\item $move(m)$: $m$ is a move.
+\end{itemize}
+Finally, we use atoms $rangeX(x)$ and $rangeY(y)$ to specify that $(X,Y)$ is within the limits of the grid.
+
+\subsubsection{Instance Specification}
+To specify a particular MAPF instance, we define facts for atoms of the form $agent(a)$, for each $a\in A$, $obstacle(x,y)$ for each $(x,y)$ that is marked as an obstacle in the grid, $rangeX(x)$ for each $x\in\{1,\ldots,w\}$, where $w$ is the width of the grid, and $rangeY(y)$ for each $y\in\{1,\ldots,h\}$, where $h$ is the height of the grid. Additionally, we define the initial cells for each agent, adding one fact of the form $at(a,x_a,y_a,0)$ for each agent $a\in \mathcal{A}$, where $(x_a,y_a)=init(a)$. Furthermore add an atom of the form $time(t)$ for every $t\in\{1,\dots,\mathtt{T}\}$. The number of rules needed to encode a MAPF instance is therefore in $\Theta(|\mathcal{A}| + \mathtt{T} + |V|)$.
+
+\subsubsection{Effects}
+To encode the effects of the five actions, we use a single rule written as follows:
+\begin{equation}\small\label{encoding:effectsone}
+\begin{split}
+at(A,X,Y,T) \leftarrow &exec(A,M,T-1),\\&at(A,X',Y',T-1), \\&delta(M,X',Y',X,Y).
+\end{split}
+\end{equation}
+which specifies that if agent $A$ is at position $(X',Y')$ in time instant $T-1$, then it will be in position $(X,Y)$ in time instant $T$ iff $(X,Y)$ and $(X',Y')$ satisfy predicate $delta$. Auxiliary predicate $delta$ is used to establish a relation between $(X,Y)$ and $(X',Y')$ given a certain move $M$ in the following way:
+\begin{equation}\small\label{encoding:delta}
+\begin{split}
+&delta(\Right,X,Y,X+1,Y) \leftarrow rangeX(X), rangeY(Y),\\
+&delta(\Left,X,Y,X-1,Y) \leftarrow rangeX(X), rangeY(Y),\\
+&delta(\Up,X,Y,X,Y+1) \leftarrow rangeX(X), rangeY(Y),\\
+&delta(\Down,X,Y,X,Y-1) \leftarrow rangeX(X), rangeY(Y),\\
+&delta(\Wait,X,Y,X,Y) \leftarrow rangeX(X),rangeY(Y).
+\end{split}
+\end{equation}
+A grounding time predicate $delta$ results in 5 rules per each position of the grid. This defines that the total number of grounded instances for rule \eqref{encoding:effectsone} is proportional to the size of the grid, the number of agents and the number of time instants. The total number of instances for rules of the form \eqref{encoding:effectsone} and \eqref{encoding:delta} is in $\Theta(|\mathcal{A}|\cdot |V| \cdot \mathtt{T})$.
+
+\subsubsection{Parallel move execution}
+We need to encode that each agent performs exactly one move at each time instant. To do this we write the following rule:
+\begin{equation}\small\label{encoding:delta}
+\begin{split}
+|\{exec(A,M,T-1) : move(M) \}| = 1 \leftarrow &time(T),\\&agent(A).
+\end{split}
+\end{equation}
+Upon grounding the number of instances of this rule is in $\Theta(|\mathcal{A}|\cdot \mathtt{T})$.
+\subsubsection{Legal positions}
+We need to express that the agents move through the vertices in the graph; that is, they cannot exit the grid or visit an obstacle cell. We do so using the following three rules:
+\begin{equation}\label{encoding:legal}\small
+    \begin{split}
+&\leftarrow at(A,X,Y,T), not\: rangeX(X),\\
+&\leftarrow at(A,X,Y,T), not\: rangeY(Y),\\
+&\leftarrow at(A,X,Y,T), obstacle(X,Y). %no hay robots encima de obstaculos
+    \end{split}
+\end{equation}
+The total number of grounded rules for the rules of form \eqref{encoding:legal} is in $\Theta(|\mathcal{A}| \cdot |V| \cdot \mathtt{T})$, since it depends on the number of atoms of the form $at$, $obstacle$, $rangeX$, and $rangeY$.
+
+\subsubsection{Vertex Conflicts}
+To express that no agents can be at the same vertex we use the following constraint, which is similar to those used in the encoding to ASP by \acite{ErdemKOS13} and \acite{SurynekFSB16} \textbf{revisar si es la cita correcta a Surynek}.
+\begin{equation}\small\label{encoding:vertexone}
+    \leftarrow at(a,x,y,t), at(a',x,y,t)
+\end{equation}
+The number of instances for this rule \eqref{encoding:vertexone} after grounding is $\Theta(|\mathcal{A}^2| \cdot |V| \cdot \mathtt{T})$. Note that this is the first rule so far whose instantiation is quadratic on the number of agents. This motivates the improvement we present later in the following section.
+\subsubsection{Swap Conflicts}
+No pair of agents can swap their positions. We express this avoiding horizontal and vertical swaps using the following constraints.
+\begin{equation}\small\label{encoding:swapone}
+  \begin{split}
+        \leftarrow &at(A,X+1,Y,T-1), at(A',X,Y,T-1),\\
+        &at(A,X,Y,T), at(A',X+1,Y,T). \text{\% horizontal swap} \\
+        \leftarrow &at(A,X,Y+1,T-1), at(A',X,Y,T-1),\\
+        &at(A,X,Y,T), at(A',X,Y+1,T). \text{\% vertical swap}
+  \end{split}
+\end{equation}
+The number of ground rules for \eqref{encoding:swapone} is in $\Theta(|\mathcal{A}|^2 \cdot |V| \cdot \mathtt{T})$.
+
+\subsubsection{Goal Achievement}
+We specify with a constraint that no agent is away from its goal at time $\mathtt{T}$:
+\begin{equation}\small\label{encoding:goal}
+  \begin{split}
+&at\_goal(a,t) \leftarrow at(a,x,y,t), goal(a,x,y),\\
+&\leftarrow agent(a), not \; at\_goal(a,\mathtt{T}).
+\end{split}
+\end{equation}
+The number of instances for rules \eqref{encoding:goal} is $\Theta(\mathcal{A} \cdot |V| \cdot \mathtt{T})$.
+\subsubsection{Size of Basic Encoding}
+After grounding, it follows that the size of the total encoding is in $\Theta(\mathcal{A} \cdot |V| \cdot \mathtt{T})$. That is, it is quadratic in the number of agents, linear in the size of the grid, and linear in the makespan parameter $\mathtt{T}$.

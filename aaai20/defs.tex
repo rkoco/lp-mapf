@@ -1,0 +1,159 @@
+% \newcommand{\C}[1]{\ensuremath{\mathcal{#1}}\xspace}
+% \newcommand{\R}{\C{R}}
+% \newcommand{\D}{\C{D}}
+% %\newcommand{\nnfev}{\models_{\mathsf{rg}}}
+% \newcommand{\nnfev}{\models{\kern-.8em\lower.9ex\hbox{\rm\scriptsize\textsf{rg}}}}
+% %u\kern-.56em\lower.3ex\mbox{2}
+
+% \newcommand{\Deff}{\ensuremath{\C{D}_\mathit{eff}}\xspace}
+% \newcommand{\Dpr}{\ensuremath{\C{D}_\mathit{ap}}\xspace}
+% \newcommand{\Dnpr}{\ensuremath{\C{D}_\mathit{nap}}\xspace}
+% \newcommand{\Duna}{\ensuremath{\C{D}_\mathit{una}}\xspace}
+% \newcommand{\Dso}{\ensuremath{\C{D}_{S_0}}\xspace}
+% \newcommand{\Kinit}{\ensuremath{\C{K}_\mathit{init}}\xspace}
+
+% % first-order aliases
+% \newcommand{\x}{\ensuremath{\vec{x}}}
+% \newcommand{\y}{\ensuremath{\vec{y}}}
+% \newcommand{\Ex}[1]{\ensuremath{(\exists #1)\,}}
+% \newcommand{\fall}[1]{\ensuremath{(\forall #1)\,}}
+% \newcommand{\Exd}[1]{\ensuremath{(\exists #1).\,}}
+% \newcommand{\falld}[1]{\ensuremath{(\forall #1).\,}}
+% \newcommand{\Lang}{\C{L}\xspace}
+% \newcommand{\LangFO}{\C{L}_{FO}\xspace}
+% \newcommand{\Vars}{\ensuremath{\mathrm{Vars}}}
+% \newcommand{\QPrefix}{\ensuremath{\mathsf{QPrefix}}\xspace}
+% \newcommand{\Tempmembers}{\ensuremath{\Upsilon}\xspace}
+% \newcommand{\ground}{\ensuremath{\mathsf{ground}}\xspace}
+
+% \newcommand{\SCond}{\ensuremath{\mathsf{SensedCond}}\xspace}
+
+% \newcommand{\subst}{\ensuremath{\mathtt{subst}}}
+
+% \newcommand{\eqdef}{\ensuremath{\overset{\text{def}}{=}}}
+
+\newcommand{\proofstring}{Proof}
+%\newcommand{\proof}{\noindent\textbf{\proofstring:}\xspace}
+\newcommand{\proofsketchstring}{Proof sketch}
+\newcommand{\proofsketch}{\noindent\textbf{\proofsketchstring:}\xspace}
+\newenvironment{pf}[1][]{\noindent\textbf{\proofstring\ifthenelse{\equal{#1}{}}{:}{~(#1) :}}\xspace}{\hfill\QED\medskip\par}
+\newenvironment{pfsketch}[1][]{\noindent\textbf{\proofsketchstring\ifthenelse{\equal{#1}{}}{:}{~(#1) :}}\xspace}{\hfill\QED\medskip\par}
+
+% \newcommand{\base}{\noindent\textit{Base case:}\xspace}
+% \newcommand{\bases}{\noindent\textit{Base cases:}\xspace}
+% \newcommand{\induction}{\noindent\textit{Induction:}\xspace}
+\newcommand{\QED}{\hfill$\blacksquare$\vspace{0pt}}
+% \newcommand{\GIF}[3]{\ensuremath{\mathbf{if}~#1~\mathbf{then}~#2~\mathbf{else}~#3~\mathbf{endif}}}
+% \newcommand{\GWHILE}[3][]{\ensuremath{\mathbf{while}_{#1}~#2~\mathbf{do}~#3~\mathbf{endwhile}}}
+% \newcommand{\scomment}[1]{{\bfseries [\textsl{#1}]}}
+% \newcommand{\golog}{Golog\xspace}
+% \newcommand{\eagle}{\textsc{EaGle}\xspace}
+% \newcommand{\predeq}{\sqsubseteq}
+% \newcommand{\pred}{\sqsubset}
+
+
+
+% \newcommand{\SC}{Situation Calculus\xspace}
+
+
+\newcommand{\angled}[1]{\ensuremath{\langle #1\rangle}}
+%\newcommand{\comment}[1]{\textbf{[#1]}}
+
+%% LTL operators
+\newcommand{\final}{\ensuremath{\mathsf{final}}\xspace}
+\newcommand{\true}{\ensuremath{\mathsf{true}}\xspace}
+\newcommand{\false}{\ensuremath{\mathsf{false}}\xspace}
+\newcommand{\until}{\ensuremath{\operatorname{\mathsf{U}}}}
+\newcommand{\release}{\ensuremath{\operatorname{\mathsf{R}}}}
+%\newcommand{\next}{\ensuremath{{\scriptstyle \bigcirc}}}
+
+%\def\next{\raise1.4pt\hbox{$\scriptstyle\bigcirc$}}
+
+\newcommand{\Al}{\ensuremath{\Box}}
+\newcommand{\Ev}{\ensuremath{\Diamond}}
+
+\newcommand{\acite}[1]{\citeauthor{#1}~\shortcite{#1}}
+\newcommand{\nbcite}[1]{\citeauthor{#1}~\citeyear{#1}}
+%\newcommand{\shortcite}[1]{\cite{#1}}
+
+% theapa alias:
+%\newcommand{\acite}[1]{\citeauthor{#1}~\cite{#1}}
+%\newcommand{\acite}[1]{\cite{#1}}
+%\newcommand{\citeauthor}[1]{\cite{#1}}
+
+%% natbib aliases:
+%\newcommand{\acite}[1]{\citet{#1}}
+\makeatletter
+%\DeclareRobustCommand{\cite}{\@ifnextchar<{\@jbcite}{\@jbcite<>}}
+%\def\@jbcite<#1>{\@ifnextchar[{\@@jbcite<#1>}{\@@jbcite<#1>[]}}
+%\def\@@jbcite<#1>[#2]#3{\protect\citep[#1][#2]{#3}}
+%\def\citeS{\@ifnextchar[{\@jbciteS}{\@jbciteS[]}}
+%\def\citeR#1{\citealp{#1}}
+%\def\@jbciteS[#1]#2{\citeauthor{#2}'s #1 \cite{#2}}
+%\def\@jbciteS[#1]#2{arg1=#1 arg2=#2}}
+\makeatother
+
+%\setcitestyle{round}
+
+
+\newcommand{\Paragraph}[1]{\noindent\textbf{#1}\hspace{.8em}}
+
+\newcommand{\PBS}[1]{\let\temp=\\#1\let\\=\temp}
+\newcommand{\fs}[1]{\fontsize{#1}{#1}\selectfont}
+\newenvironment{program}{\smallskip\begin{singlespaced}\begin{small}\begin{alltt}}%
+  {\end{alltt}\end{small}\end{singlespaced}\smallskip}
+
+
+
+\newcommand{\bestMetric}{\ensuremath{\mathit{bestMetric}}}
+
+
+\newcommand{\strips}{\textsc{STRIPS}\xspace}
+\newcommand{\adl}{\textsc{ADL}\xspace}
+
+% complexity classes
+
+\newcommand{\complexityclass}[1]{{\rm\textsf{#1}}\xspace}
+\newcommand{\Pclass}{\complexityclass{P}}
+\newcommand{\PSPACE}{\complexityclass{PSPACE}}
+\newcommand{\NPSPACE}{\complexityclass{NPSPACE}}
+\newcommand{\APX}{\complexityclass{APX}}
+\newcommand{\EXPSPACE}{\complexityclass{EXPSPACE}}
+\newcommand{\EXPTIME}{\complexityclass{EXPTIME}}
+\newcommand{\NP}{\complexityclass{NP}}
+
+
+\newcommand{\Succ}{\ensuremath{Succ}}
+
+% Other aliases for algorithms
+\newcommand{\Up}{\ensuremath{\mathit{up}}\xspace}
+\newcommand{\Down}{\ensuremath{\mathit{down}}\xspace}
+\newcommand{\Left}{\ensuremath{\mathit{left}}\xspace}
+\newcommand{\Right}{\ensuremath{\mathit{right}}\xspace}
+\newcommand{\Wait}{\ensuremath{\mathit{wait}}\xspace}
+
+
+
+\newcommand{\techreport}[1]{#1}
+\newcommand{\shortpaper}[1]{}
+
+\newcommand{\smallboldfacenumber}{\tiny\bfseries}
+\newcommand{\update}{\texttt{Update()}\xspace}
+\newcommand{\extractbest}{\texttt{Extract-Best()}\xspace}
+\newcommand{\snext}{\ensuremath{s_{next}}}
+\newcommand{\sstart}{\ensuremath{s_{\mathit{start}}}\xspace}
+\newcommand{\search}{\ensuremath{\mathit{search}}\xspace}
+\newcommand{\Next}{\ensuremath{\mathit{next}}\xspace}
+\newcommand{\saux}{\ensuremath{s_{\mathit{aux}}}\xspace}
+\newcommand{\sinit}{\ensuremath{s_{\mathit{init}}}\xspace}
+\newcommand{\sgoal}{\ensuremath{s_{\mathit{goal}}}\xspace}
+\newcommand{\scurrent}{\ensuremath{s_{\mathit{current}}}\xspace}
+\newcommand{\parent}{\ensuremath{\mathit{parent}}}
+\newcommand{\counter}{\ensuremath{\mathit{counter}}}
+\newcommand{\restart}{\ensuremath{\mathit{restart}}}
+\newcommand{\updated}{\ensuremath{\mathit{updated}}\xspace}
+\newcommand{\decrease}{\ensuremath{\mathit{decrease}}\xspace}
+\newcommand{\pathtogoal}{\ensuremath{\mathit{pathToGoal}}\xspace}
+\newcommand{\Tinc}{\ensuremath{E^{\mathit{inc}}}\xspace}
+\newcommand{\Tdec}{\ensuremath{E^{\mathit{dec}}}\xspace}
+\newcommand{\Tupd}{\ensuremath{V^{\mathit{upd}}}\xspace}

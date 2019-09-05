@@ -1,0 +1,122 @@
+\section{Empirical Evaluation}
+We experimented on 4-connected square grids with random randomly placed obstacles and agent positions.
+
+We compare our approach to multiple state-of-the-art search algorithms: ICTS \cite{Sharon13}, EPEA* \cite{Goldenberg14}, ICBS-h \cite{FelnerLB00KK18}.
+
+The code used for our implementation was written in Python 3.7 using Clingo 5.3 () for the ASP solver. Clingo was run with 4 threads in \textit{parallel-mode}, and using \textit{usc} as the optimization strategy. The search based algorithms use a implementation written C\#, based on the implementation in \cite{FelnerLB00KK18}.
+
+All the experiments were tested on a 3.40GHz Intel Core i5-3570K computer with 8GB of memory. We set a runtime limit of 5 minutes for all the problems.
+
+\subsection{Open N x N grids}
+
+
+
+\begin{figure}[]
+    \centering
+    \includegraphics[width=0.4\textwidth]{exp1ag}
+    \caption{Success rate on 8x8 grid by number of agents}
+    \label{fig:8x8succ}
+    \includegraphics[width=0.4\textwidth]{exp1obs}
+    \caption{Success rate on 8x8 grid by percentage of obstacles}
+    \label{fig:8x8obs}
+\end{figure}
+
+\textbf{Experiment 1:} First, we experimented on 8x8 grids with 10\% obstacles, running 10 with 4 to 18 randomly placed agents and goals. Figure \ref{fig:8x8succ} shows the \textit{success rate} (percentage of solved instances within runtime limit over 10 random instances). ASP-first returns the optimal sum-of-cost solution within the minimal \emph{makespan}; and ASP-opt the optimal cost solution among all possible \emph{makespans}.
+
+Later, we ran experiments with 10 agents on 8x8 grids, varying the percentage of obstacles from 0\% to 30\% .
+
+In both of the tests our algorithm outperforms most of the other search based algorithms, and is competitive with ICBS-h. This shows the benefits of using our encoding for problems with lots of potential conflicts. 
+
+It's important to highlight the great success rate of ASP-first, solving almost all the instances. Table \ref{tab:subopt}, shows the suboptimality of the solutions returned on the second test. The quality of the first solutions decreases as the number of obstacles increases. This makes sense as the probability of having situations similar to the one described on Figure \ref{fig:grid_example} are greater. But nevertheless the quality of the solutions are still good.
+
+% \begin{table}[]
+% \begin{tabular}{|r|r|r|r|}
+% \cline{2-3}
+% \multicolumn{1}{l|}{} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Cost of the Solution\\ (Sum over 10 instances)\end{tabular}} & \multicolumn{1}{|l}{} \\ \hline
+% Agents & \multicolumn{1}{l}{ASP-first} & \multicolumn{1}{|l|}{ASP-opt} & \multicolumn{1}{|l|}{Suboptimality} \\ \hline
+% 4 & 190 & 190 & 1 \\
+% 5 & 291 & 291 & 1 \\
+% 6 & 318 & 318 & 1 \\
+% 7 & 358 & 357 & 1.0028 \\
+% 8 & 427 & 426 & 1.0023 \\
+% 9 & 534 & 530 & 1.0075 \\
+% 10 & 555 & 553 & 1.0036 \\
+% 11 & 628 & 615 & 1.0211 \\
+% 12 & 609 & 598 & 1.0183 \\
+% 13 & 673 & 672 & 1.0014 \\
+% 14 & 655 & 653 & 1.0030 \\
+% 15 & 886 & 878 & 1.0091 \\
+% 16 & 773 & 773 & 1 \\
+% 17 & 602 & 600 & 1.0033 \\
+% 18 & 511 & 511 & 1 \\ \hline
+% Total: & 8010 & 7965 & 1.0056 \\ \hline
+% \end{tabular}
+% \caption{Suboptimality on 8x8 grids by Num of Agents}
+% \label{tab:subopt1}
+% \end{table}
+
+
+\begin{table}[]
+\begin{tabular}{|r|r|r|r|}
+\cline{2-3}
+\multicolumn{1}{l|}{} & \multicolumn{2}{c}{\begin{tabular}[c]{@{}c@{}}Cost of the Solution\\ (Sum over 10 instances)\end{tabular}} & \multicolumn{1}{|l}{} \\ \hline
+\% Obstacles & \multicolumn{1}{|c|}{ASP-first} & \multicolumn{1}{c}{ASP-opt} & \multicolumn{1}{|c|}{Suboptimality} \\ \hline
+0 & 535 & 535 & 1 \\
+5 & 524 & 519 & 1.0096 \\
+10 & 544 & 540 & 1.0074 \\
+15 & 500 & 498 & 1.0040 \\
+20 & 608 & 602 & 1.0099 \\
+25 & 487 & 476 & 1.0231 \\
+30 & 207 & 198 & 1.0455 \\\hline
+Total: & 3405 & 3368 & 1.01098 \\ \hline
+\end{tabular}
+\caption{Suboptimality of solutions on 8x8 grids by percentage of Obstacles }
+\label{tab:subopt}
+\end{table}
+
+\textbf{Experiment 2:} Next, we experimented on NxN grids with 10 agents and 15\% obstacles, varying N from 12 to 30.
+
+Table \ref{tab:nxn} shows the average runtime performance over 10 instances for each grid size. The last column shows the percentage of the time spent grounding the encoding. As we can see our algorithm has worse performance as the grid size increases (and not necessarily with an increase on the difficulty of the problem), this could be explained by the overhead of defining and grounding predicates over each cell and agent. On the other hand in real life applications, where the map is already known beforehand, we potentially can \emph{preground} most of the encoding.
+
+\begin{table}[]
+\begin{tabular}{r|r|r|r|}
+\cline{2-4}
+\multicolumn{1}{l|}{} & \multicolumn{1}{c|}{ICBS-h} & \multicolumn{2}{c|}{ASP-opt} \\ \hline
+\multicolumn{1}{|l|}{Grid Size} & \multicolumn{1}{l|}{Runtime (ms)} & \multicolumn{1}{l|}{Runtime  (ms)} & \multicolumn{1}{l|}{\% grounding} \\ \hline
+\multicolumn{1}{|r|}{12 x 12} & 19.09 & 5849.78 & 91.86 \\
+\multicolumn{1}{|r|}{18 x 18} & 8.22 & 15316.27 & 92.92 \\
+\multicolumn{1}{|r|}{24 x 24} & 8.07 & 36697.75 & 94.71 \\
+\multicolumn{1}{|r|}{30 x 30} & 2.83 & 86209.54 & 95.80 \\ \hline
+\end{tabular}
+\caption{Performance on NxN grids}
+\label{tab:nxn}
+\end{table}
+
+
+
+%%%%%% Referencias
+% ICTS
+% Sharon et al. (2013)
+% Sharon, G.; Stern, R.; Goldenberg, M.; and Felner, A.  2013.  The increasing cost tree search for optimal multi-agent pathfinding.Artificial Intelligence195:470–495.
+
+% EPEA
+% Goldenberg  et  al.  (2014)
+% Goldenberg, M.; Felner, A.; Stern, R.; Sharon, G.; Sturtevant, N.;Holte, R.; and Schaeffer, J.  2014.  Enhanced partial expansionA*.JAIR50:141–187.
+
+% ICBS  
+% Boyarski  et  al.  (2015)
+% Boyarski, E.; Felner, A.; Stern, R.; Sharon, G.; Tolpin, D.; Betza-lel, O.; and Shimony, S.  2015.  ICBS: improved conflict-basedsearch algorithm for multi-agent pathfinding.   InIJCAI, 740–746.
+
+% ICBS-h
+% Adding Heuristics to Conflict-Based Search for Multi-Agent Path Finding
+
+% CBS
+% Sharon, G.; Stern, R.; Felner, A.; and Sturtevant, N.  2012a.Conflict-based search for optimal multi-agent path finding.InProceedings of the AAAI Conference on Artificial Intelli-gence, 563–569
+
+% Sharon, G.; Stern, R.; Felner, A.; and Sturtevant, N.  2015.Conflict-based  search  for  optimal  multi-agent  pathfinding.Artificial Intelligence219:40–66.
+
+% Codigo MDD-SAT
+% Pavel Surynek: Compact Representations of Cooperative Path-Finding as SAT Based on Matchings in Bipartite Graphs. Proceedings of the 26th International Conference on Tools with Artificial Intelligence (ICTAI 2014), pp. 875-882, Limassol, Cyprus, IEEE Press, 2014, ISBN 978-1-4799-6572-4.
+
+% Codigo CBS - variantes
+

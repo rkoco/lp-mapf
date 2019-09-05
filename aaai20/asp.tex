@@ -1,0 +1,28 @@
+\section{Answer-Set Programming}
+ASP \cite{paper-de-lifschitz-what-is-ASP} is a logic based framework for solving optimization problems. For space limitations, here we describe a subset of an ASP standard that is relevant to this paper. 
+
+An ASP \emph{basic program} is a set of rules of the form:
+\begin{equation}\label{asprule}
+p\leftarrow q_1,q_2,\ldots,q_n.
+\end{equation}
+where $n\geq 0$, and $p$, $q_1,\ldots,q_n$ are so-called \emph{atoms}. The intuitive interpretation of this rule is as follows ``p is true/provable if so are $q_1,q_2,\ldots,q_n$''. When $n=0$ the rule \eqref{asprule} is called a \emph{fact}.
+
+A \emph{model} of a basic ASP program is a set of atoms $M$ that intuitively contains all and only the atoms that are provable. An important syntactic element relevant to our paper is the so-called \emph{negation as failure}. Rules containing such negated atoms look like:
+\begin{equation}\label{asprule}
+p\leftarrow q_1,q_2,\ldots,q_n, not\: r_1,not\: r_2, \ldots, not\: r_k .
+\end{equation}
+The set of atoms $M$ is a model of a program $P$ containing such rules if the \emph{reduct} of $\Pi$ with respect to $M$, denoted as $\Pi^M$ also has $M$ as a model. Intuitively $P^M$ is a basic program which results from simplifying away every occurrence of a $not\:p$ in the obvious way (i.e., eliminating the rule if $p$ is in the model $M$, and removing $not\:p$ from the rule if $p$ is not in the model $M$). For example $M=\{p\}$ is a model of $\Pi=\{p\leftarrow not\: q\}$, since $\Pi^M=\{p\leftarrow \}$ has $M$ as a model. $M'=\{q\}$ is not a model of $\Pi$ since $\Pi^{M'}=\{\}$ does not have $M'$ as a model.
+
+Another relevant type of rule is
+\begin{equation}
+    |\{p_1,p_2,\ldots,p_n\}|=1 \leftarrow q_1,q_2,\ldots,q_n.
+\end{equation}
+which states that only one among $\{p_1,\ldots,p_m\}$ is in a model $M$ if so are $\{q_1,\ldots,q_n\}$. In addition, the constraint:
+\begin{equation}
+    \leftarrow p_1,p_2,\ldots,p_n 
+\end{equation}
+(best pronounced as not all of $p_1,\ldots,p_n$) states that a model cannot contain the set $\{p_1,p_2,\ldots,p_n\}$.
+
+A very relevant feature of ASP is that programs can also contain a minimization statement expressing that one is looking for a model that minimizes a certain criteria. We introduce these constructs later when we see the details of our compilation. An ASP solver receives a program as input and outputs a model.
+
+Finally, ASP programs usually use variables to represent schemas of rules. As such $p(X)\leftarrow q(X)$ represents a family of rules where $X$ moves over all the elements constructible with the syntactic elements mentioned in the program (the so-called Herbrand base). We omit further details for lack of space. What is very relevant however, is that an ASP solver will \emph{ground} a program containing variables, effectively generating all instances of these rule schemas before finding a model.
