@@ -23,7 +23,7 @@ We use the following atoms:
 Finally, we use atoms $rangeX(x)$ and $rangeY(y)$ to specify that $(X,Y)$ is within the limits of the grid.
 
 \subsubsection{Instance Specification}
-To specify a particular MAPF instance, we define facts for atoms of the form $agent(a)$, for each $a\in A$, $obstacle(x,y)$ for each $(x,y)$ that is marked as an obstacle in the grid, $rangeX(x)$ for each $x\in\{1,\ldots,w\}$, where $w$ is the width of the grid, and $rangeY(y)$ for each $y\in\{1,\ldots,h\}$, where $h$ is the height of the grid. Additionally, we define the initial cells for each agent, adding one fact of the form $at(a,x_a,y_a,0)$ for each agent $a\in \mathcal{A}$, where $(x_a,y_a)=init(a)$. Furthermore add an atom of the form $time(t)$ for every $t\in\{1,\dots,\mathtt{T}\}$. The number of rules needed to encode a MAPF instance is therefore in $\Theta(|\mathcal{A}| + \mathtt{T} + |V|)$.
+To specify a particular MAPF instance, we define facts for atoms of the form $agent(a)$, for each $a\in A$, $obstacle(x,y)$ for each $(x,y)$ that is marked as an obstacle in the grid, $rangeX(x)$ for each $x\in\{1,\ldots,w\}$, where $w$ is the width of the grid, and $rangeY(y)$ for each $y\in\{1,\ldots,h\}$, where $h$ is the height of the grid. Additionally, we define the initial cells for each agent, adding one fact of the form $at(a,x_a,y_a,0)$ for each agent $a\in \mathcal{A}$, where $(x_a,y_a)=init(a)$. Furthermore, we add an atom of the form $time(t)$ for every $t\in\{1,\dots,\mathtt{T}\}$. The number of rules needed to encode a MAPF instance is therefore in $\Theta(|\mathcal{A}| + \mathtt{T} + |V|)$.
 
 \subsubsection{Effects}
 To encode the effects of the five actions, we use a single rule written as follows:

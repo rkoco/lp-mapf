@@ -4,7 +4,7 @@ In this section we describe MAPF and ASP. Our definition of MAPF follows closely
 \subsection{Multi-Agent Pathfinding}
 A MAPF instance is defined by a tuple $(G,\mathcal{A},init,goal)$, where $G=(V,E)$ is a graph, $A$ is the set of agents, and $init:A\rightarrow V$ and $goal:A\rightarrow V$ are functions used to denote the initial and goal vertex for each of the agents.
 
-At each time instant each agent at vertex $v$ can either move to any of its successors in $G$ or not move at all. When the graph $G$ is a 4-connected grid, as we assume in the rest of the paper, there are 5 possible moves at each time instant: $\{\Up,\Down,\Left,\Right,\Wait\}$, where the first four move the agent in one of the four cardinal positions, and the \Wait move results in the agent staying at its current vertex. A \emph{path} over $G$ is a sequence of vertices in  $V$, $v_1v_2\ldots v_n$, where either $v_i=v_{i+1}$ (i.e., a \Wait action is performed) or $(v_i,v_{i+1})\in E$ (i.e., a non wait action is performed) for every $i\in\{1,\ldots,n-1\}$. Given a path $\pi$ we denote by $\pi[i]$ the $i$-th element in $\pi$, where $i\in\{1,\ldots,|\pi|\}$.
+At each time instant each agent at vertex $v$ can either move to any of its successors in $G$ or not move at all. When the graph $G$ is a 4-connected grid, as we assume in the rest of the paper, there are 5 possible moves at each time instant: $\{\Up,\Down,\Left,\Right,\Wait\}$, where the first four move the agent in one of the four cardinal positions, and the \Wait move results in the agent staying at its current vertex. A \emph{path} over $G$ is a sequence of vertices in  $V$, $v_1v_2\ldots v_n$, where either $v_i=v_{i+1}$ (i.e., a \Wait move is performed) or $(v_i,v_{i+1})\in E$ (i.e., a non wait action is performed) for every $i\in\{1,\ldots,n-1\}$. Given a path $\pi$ we denote by $\pi[i]$ the $i$-th element in $\pi$, where $i\in\{1,\ldots,|\pi|\}$.
 
 A solution to MAPF is a function $sol:\mathcal{A}\rightarrow V^*$, which associates a path to each of the agents, such that the first and last vertices of $sol(a)$ are, respectively, $init(a)$ and $goal(a)$. Without loss of generality henceforth we assume that all paths in $sol$ have the same size, since wait actions may be used at the end of any action sequence to remain on the same vertex. Below we denote by $\mathcal{T}$ the set $\{1,\ldots,M\}$, where $M$ is the size of any of the paths in $sols$. We also refer to $M-1$ as the \emph{makespan} of the solution.
 
@@ -15,7 +15,7 @@ In addition, $sol$ must be \emph{conflict-free}, which means that if $\pi$ and $
 \end{itemize}
 Following most of the literature in MAPF (e.g., \nbcite{SharonSFS12}), we consider only these two types of conflicts, and no other conflicts. For example, we do not consider so-called \emph{following conflicts} \cite{SternSFK0WLA0KB19}, which do not allow an agent to occupy at time $t+1$ the position of another agent had at time $t$.
 
-A standard assumption in MAPF is that all actions cost one cost unit unless wait actions that are performed by agents at the goal when no other action is planned in the future. Thus the cost of path $\pi$ for agent $a$ is written as $|\rho|$, when $\rho$ is the shortest sequence such that $\pi=\rho(goal(a))^k$, for some $k$. The cost of a solution $sol$ is defined as $\sum_{a\in A} c(sol(a))$.
+A standard assumption in MAPF is that all moves cost one unit except for waits performed at the goal when no other action is planned in the future. Thus the cost of path $\pi$ for agent $a$ is written as $|\rho|$, when $\rho$ is the shortest sequence such that $\pi=\rho(goal(a))^k$, for some $k$. The cost of a solution $sol$ is defined as $\sum_{a\in A} c(sol(a))$.
 
 A solution $sol$ is \emph{optimal under sum-of-costs}, or simply \emph{cost-optimal}, if no other solution $sol'$ exists such that $c(sol')<c(sol)$. A solution $sol$ is makespan-optimal, if no other solution exists whose makespan is smaller than the makespan of $sol$. A makespan-optimal solution is not necessarily a cost-optimal solution. This is illustrated in Figure~\ref{fig:makespancost}.
 
@@ -54,7 +54,7 @@ Another relevant type of rule for our paper is:
 \end{equation*}
 Intuitively here we say that if $q_1,q_2,\ldots,q_n$ are all provable, then $k$ of the elements in $\{p_1,p_2,\ldots,p_n\}$ must appear in the model. This definition allows programs to have multiple models\footnote{Technically, negation as failure alone also allows the user to create programs with multiple models, but in our translation we define multiple models exploiting this type of rule.}. For example, the program:
 \begin{align*}
-    &s\\
+    &s,\\
     &|{p,q,r}|=1\leftarrow s
 \end{align*}
 has three models: $\{p,s\}$, $\{q,s\}$, and $\{r,s\}$.
@@ -71,7 +71,7 @@ Finally, ASP programs may contain variables to represent rule \emph{schemas}. As
 \end{equation}
 where uppercase letters represent \emph{variables}. Intuitively a variable can take any value among the set of \emph{terms}. As such, rule \eqref{aspwithvariables} represents that when $c$ is a term and $q(c)$ is provable, so is $p(c)$. Intuitively a term represents an object that can be named in the program. The set of terms for a program is syntactically determined from the program using the constants mentioned in it. The set of terms has a theoretical counterpart, the so-called \emph{Herbrand base}, whose definition we omit here, since it is not key for understanding the rest of the paper.
 
-What is key to understand for the rest of the paper, because it affects our conclusions, is that in the process of finding a model for a program an initial step that is carried out is \emph{grounding}, which removes variables from the program. Since there are plenty of optimizations that can be carried out during grounding time it is not easy to describe the grounding process with complete precision. For example, the grounded version for program
+What is key to understand for the rest of the paper, because it affects our conclusions is that, in the process of finding a model for a program, an initial step that is carried out is \emph{grounding}. Grounding instantiates rules with variables, effectively removing all variables from the program. Since there are plenty of optimizations that solvers employ during grounding, it is not easy to describe the grounding process with complete precision here, and therefore we will just describe it intuitively. For example, the grounded version of program:
 \begin{equation}
     \{q(a),q(b),p(X)\leftarrow q(X)\}
 \end{equation} may be
@@ -79,4 +79,4 @@ What is key to understand for the rest of the paper, because it affects our conc
 &\{q(a),q(b),p(a)\leftarrow q(a),p(b)\leftarrow q(b)\} \text{ or } \\
 &\{q(a),q(b),p(a),p(b)\},
 \end{align*}
-depending on the optimizations applied at grounding time. What is however unavoidable is that grounding generates two instances for the rule $p(X)\leftarrow q(X)$ because the number of objects that satisfy predicate $q$ is two. Thus if we had declared $n$ objects satisfying $q$ we would expect the grounding process to generate $n$ instances for $p(X)\leftarrow q(X)$. As we will see in the rest of the paper, the size of the grounded version of the program is key for performance.
+depending on the optimizations applied at grounding time. What is however unavoidable is that grounding generates two instances for the rule $p(X)\leftarrow q(X)$ because the number of objects that satisfy predicate $q$ is two. Thus, if we had declared $n$ objects satisfying $q$ we would expect the grounding process to generate $n$ instances for $p(X)\leftarrow q(X)$. As we will see in the rest of the paper, the size of the grounded version of the program is key for performance.

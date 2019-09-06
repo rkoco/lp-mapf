@@ -1,10 +1,8 @@
 \section{Conclusions and Future Work}
-We proposed a compilation to ASP that produces cost-optimal solutions, which is competitive with other state of the art algorithms on congested grids.
+In this paper we proposed the first compilation of MAPF under the sum-of-costs assumption to ASP. We proposed a number of variants of the approach. In its first, basic form, the encoding is quadratic on the number of agents, just like existing approaches to ASP (e.g. \nbcite{ErdemKOS13}; \nbcite{GebserKKS14}), and like the encoding of MDD-SAT \cite{SurynekFSB16}, a state of the art SAT-based solver. We also propose an encoding that is linear on the number of agents, and show how we can benefit by running Dijkstra's algorithm during preprocessing time to generate a more compact encoding.
 
-Future research will be focused on different aspects:
-\begin{itemize}
-    \item Because the grounding process takes a lot of time in the algorithm, we will research alternatives to execute the \emph{grounding}. This can mean doing this process manually.
-        
-    \item Research the possibility on making a sub optimal solver based on our encodings. Debido a los alentadores resultados mostrados en grillas pequeñas es que podríamos integrar nuestro solver a otros algoritmos como Windowed Hierarchical Cooperative A*. De esta manera podemos aprovechar los beneficios de los algoritmos basados en busqueda en grillas de gran tamaño  y los beneficios de nuestra codificación en problemas compactos.
+In our empirical evaluation on square grids, we observed that the linear encoding substantially outperforms the quadratic encoding. In general our approach outperforms the search-based and SAT-based state-of-the-art solvers we compared with as the number of agents increases. This suggests that ASP is a competitive approach for solving highly congested MAPF instances.
 
-\end{itemize}
+An important drawback of our approach, which only becomes apparent as larger grids are used, is grounding time. A potential (yet not elegant) line of improvement is to perform grounding manually.
+
+Another potential line of future work is the integration of our approach to other algorithms like Windowed Hierarchical Cooperative A* \cite{Silver05}, since it is more efficient to generate shorter (though suboptimal) solutions on larger maps.

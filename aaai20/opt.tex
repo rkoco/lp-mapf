@@ -7,18 +7,18 @@ There is a natural way to encode sum-of-costs minimization: to minimize the numb
 This encoding is similar to the approach used in MDD-SAT~\cite{SurynekFSB16}: the idea to minimize the actions performed by the agent at each cell before stopping at the goal. At a first glance one might think that we just need to count every action performed away from the goal and minimize this number. This approach, however does not work because a \Wait at the goal at time $t$ \emph{should} be counted if the agent will move away from the goal at some instant $t'$ greater than $t$.
 
 To identify time instants at which we know the agent will not move away from the goal, we introduce the predicate $at\_goal\_back(a,t)$, which specifies that agent $a$ has reached the goal at time $t$  and will not move away in the future:
-\begin{eqnarray*}\small
+{\small\begin{eqnarray*}
     at\_goal\_back(A,\mathtt{T}) &\leftarrow& agent(A), \\
     at\_goal\_back(A,T-1) &\leftarrow &at\_goal\_back(A,T),\\
     &&exec(A,wait,T-1).
-  \end{eqnarray*}
+  \end{eqnarray*}}
 
 Now we define predicate $cost$, such that thre is an atom of the form $cost(a,t,1)$ in the model whenever agent $a$ performes an action at time $t$ before stopping at the goal. First we express that moving an agent from a cell that is not the goal is penalized by one unit:
 \begin{equation*}\small
 cost(A,T,1) \leftarrow at(A,X,Y,T), not \; goal(A,X,Y).
 \end{equation*}
 Second, moving an agent away from the goal is also penalized by one:
-\begin{equation*}\small
+{\small \begin{equation*}\small
   \begin{split}
     cost(A,T,1) \leftarrow &at(A,X,Y,t), goal(A,X,Y), \\
     &exec(A,M,t), M \neq \Wait.

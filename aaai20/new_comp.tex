@@ -23,10 +23,11 @@ Using these predicates we now express the fact that a single cell cannot be ente
 It is easy to verify that these rules do not mention pairs of different agents, unlike \eqref{encoding:vertexone} and \eqref{encoding:swapone}, and as such after grounding we end with $\Theta(|\mathcal{A}|\cdot|V|\cdot\mathtt{T})$ rules, and therefore the resulting encoding is linear in $|\mathcal{A}|$.
 
 \section{Using Search to Reduce the Atoms}
-We can exploit our run of Dijkstra's algorithm during preprocessing time to generate an even smaller encoding by replacing rule~\ref{encoding:effectsone} by the following rule.
+We can exploit our run of Dijkstra's algorithm during preprocessing time to generate an even smaller encoding by replacing rule~\eqref{encoding:effectsone} by the following rule.
 \begin{equation}\small
   \begin{split}
-    at(A,X,Y,T) \leftarrow &at(A,X',Y',t), exec(A,M,T), \cup B, \\
+    at(A,X,Y,T) \leftarrow &at(A,X',Y',T-1), exec(A,M,T),\\
+    &delta(M,X',Y',X,Y), \\
     &cost\_to\_go(A,X,Y,C), T + C <= \mathtt{T},
   \end{split}
 \end{equation}
