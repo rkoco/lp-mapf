@@ -1,5 +1,5 @@
 \section{Background}
-In this section we describe MAPF and ASP. Our definition of MAPF follows closely that of \acite{SternSFK0WLA0KB19}. 
+In this section we describe MAPF and ASP. Our definition of MAPF follows closely that of \acite{SternSFK0WLA0KB19}.
 
 \subsection{Multi-Agent Pathfinding}
 A MAPF instance is defined by a tuple $(G,\mathcal{A},init,goal)$, where $G=(V,E)$ is a graph, $A$ is the set of agents, and $init:A\rightarrow V$ and $goal:A\rightarrow V$ are functions used to denote the initial and goal vertex for each of the agents.
@@ -17,13 +17,13 @@ Following most of the literature in MAPF (e.g., \nbcite{SharonSFS12}), we consid
 
 A standard assumption in MAPF is that all actions cost one cost unit unless wait actions that are performed by agents at the goal when no other action is planned in the future. Thus the cost of path $\pi$ for agent $a$ is written as $|\rho|$, when $\rho$ is the shortest sequence such that $\pi=\rho(goal(a))^k$, for some $k$. The cost of a solution $sol$ is defined as $\sum_{a\in A} c(sol(a))$.
 
-A solution $sol$ is \emph{optimal under sum-of-costs}, or simply \emph{cost-optimal}, if no other solution $sol'$ exists such that $c(sol')<c(sol)$. A solution $sol$ is makespan-optimal, if no other solution exists whose makespan is smaller than the makespan of $sol$. A makespan-optimal solution is not necessarily a cost-optimal solution. This is illustrated in Figure ~\ref{fig:makespancost}.
+A solution $sol$ is \emph{optimal under sum-of-costs}, or simply \emph{cost-optimal}, if no other solution $sol'$ exists such that $c(sol')<c(sol)$. A solution $sol$ is makespan-optimal, if no other solution exists whose makespan is smaller than the makespan of $sol$. A makespan-optimal solution is not necessarily a cost-optimal solution. This is illustrated in Figure~\ref{fig:makespancost}.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.24\textwidth]{graphs/makespangrid.PNG}
       \caption{Problem instance where the increase of makespan yields better \emph{sum-of-costs} solutions. The problem has 3 agents:  $a_0$, who needs to go from $(0,1)$ to $(3,1)$. And agents $a_1$ and $a_2$ who are already at the goal at the positions $(1,1)$ and $(2,1)$ respectively. The optimal cost solution with makespan $3$ is $8$ as it involves $a_1$ and $a_2$ moving away from their goal to make space for $a_0$. In contrast the optimal cost solution with makespan $5$ is $5$ as it only needs to move $a_0$.}
-    \label{makespancost}
+    \label{fig:makespancost}
 \end{figure}
 
 

@@ -1,4 +1,10 @@
-\section{Conclusions}
-- trabajo futuro posible: 
-- integrar a otro algoritmo
-- probar haciendo grounding totalmente manual o llevarlo a SAT.
+\section{Conclusions and Future Work}
+We proposed a compilation to ASP that produces cost-optimal solutions, which is competitive with other state of the art algorithms on congested grids.
+
+Future research will be focused on different aspects:
+\begin{itemize}
+    \item Because the grounding process takes a lot of time in the algorithm, we will research alternatives to execute the \emph{grounding}. This can mean doing this process manually.
+        
+    \item Research the possibility on making a sub optimal solver based on our encodings. Debido a los alentadores resultados mostrados en grillas pequeñas es que podríamos integrar nuestro solver a otros algoritmos como Windowed Hierarchical Cooperative A*. De esta manera podemos aprovechar los beneficios de los algoritmos basados en busqueda en grillas de gran tamaño  y los beneficios de nuestra codificación en problemas compactos.
+
+\end{itemize}

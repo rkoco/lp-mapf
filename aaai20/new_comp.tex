@@ -21,11 +21,13 @@ Using these predicates we now express the fact that a single cell cannot be ente
   \leftarrow lt(X,Y,T), dt(X,Y,T)
 \end{equation*}}
 It is easy to verify that these rules do not mention pairs of different agents, unlike \eqref{encoding:vertexone} and \eqref{encoding:swapone}, and as such after grounding we end with $\Theta(|\mathcal{A}|\cdot|V|\cdot\mathtt{T})$ rules, and therefore the resulting encoding is linear in $|\mathcal{A}|$.
-%\section{Bounding the effect positions}
-%We change the basic effect rules to include a bound on the positions of the agents:
-%\begin{align*}
-%    \at(A,X,Y,T) \leftarrow &at(A,X',Y',t), exec(A,M,T), \cup B, \\
-%    &cost\_to\_go(A,X,Y,C), T + C <= \mathtt{T}
-%\end{align*}
 
-%Where $cost\_to\_go(A,X,Y,C)$ specify that $C$ is the minimum distance from the position $(X,Y)$ to the goal of agent $A$. This way we can ignore the generation of rules to positions that will not reach the goal.
+\section{Using Search to Reduce the Atoms}
+We can exploit our run of Dijkstra's algorithm during preprocessing time to generate an even smaller encoding by replacing rule~\ref{encoding:effectsone} by the following rule.
+\begin{equation}\small
+  \begin{split}
+    at(A,X,Y,T) \leftarrow &at(A,X',Y',t), exec(A,M,T), \cup B, \\
+    &cost\_to\_go(A,X,Y,C), T + C <= \mathtt{T},
+  \end{split}
+\end{equation}
+where $cost\_to\_go(A,X,Y,C)$ specifies that $C$ is the minimum number of actions needed to go from $(X,Y)$ to the goal of agent $A$. This way we can ignore the generation of rules to positions that will not reach the goal, generating a much more compact encoding. This idea is related to the use of MDDs graphs in MDD-SAT \cite{SurynekFSB16}, but does not require the generation of the MDD, so it is conceptually simpler.

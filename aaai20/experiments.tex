@@ -25,14 +25,16 @@ In figure we show the \emph{breaking point}. of the thingy
 \subsection{N x N grids with random obstacles experiments} 
 Next, we experimented on $8\times 8$ and $20\times 20$ randomly generated problems with 10\% obstacles. For $8\times8$ (resp.~$20\times 20$) we generate 150 (resp.~160) problems with the number of agents in $\{4,\dots,18\}$ (resp.~$\{20,22,\ldots,50\}$). Success rates, and number of problems solved versus time are shown in Figure ~\ref{fig_obs}. 
 
-analisis
+In the $8\times8$  tests all of our encodings outperform the other algorithms in terms of success rate, this shows the benefits of using ASP as a solving mechanism. On the other hand, seeing the results on the curves of the solving time shows that there's an important factor on the basic time needed to solve. Esto se explica debido al proceso de grounding que se debe hacer al inicio de cada instanciación.
 
+En el caso de las grillas de $20x20$, podemos apreciar como la linearización de las reglas para conflictos toman una gran importancia, logrando resolver prácticamente todos los problemas. Por otro lado nuestras codificaciones básicas que usan las reglas básicas para conflictos empiezan a fallar rápidamente con más agentes, esto debido a que el número de constraints es cuadrático con respecto al número de agentes. Es interesante destacar que el uso de grid-independent encoding no resulta en cambios importantes en estas grillas.
+
+Otro punto importante es el uso del método de USC con respecto a BB. USC parte con una solución costo mínimo que no necesariamente satisface los constraints, luego hace cambios hasta encontrar una solución que cumpla estos constraints. bb por otro lado primero encuentra una solución que satisface lo constraints y hace cambios a la solución hasta encontrar y demostrar una solución de costo mínimo. Debido a que normalmente la solución a los problemas en MAPF es más cercana a la solución óptima ignorando los conflictos es que USC muestra mejores resultados.
 
 \subsection{Warehouse experiments}
-Also, we experimented on a the warehouse grid shown in Figure ~\ref{fig_ware} . 
+Also, we experimented on a the warehouse grid shown in Figure ~\ref{fig_ware}. La elección de las posiciones iniciales y objetivos de los agentes es de manera aleatoria sobre las dos columnas libres en cada borde de la grilla. We generated $10$ instances for each number of agents between $a=\{4, \ldots, 16\}$.
 
-analisis
-
+Estos resultados muestran los grandes beneficios de nuestro encoding en grillas con muchos conflictos posibles. En este mapa  hay pocos espacios libres, en particular debido a que $|V|$ es mucho más pequeño nuestra codificación es más compacta. Por otro lado, estos resultados muestran que en problemas en que el número de conflictos posibles es alto nuestro algoritmo no se muestra afectado.
 
 
 
