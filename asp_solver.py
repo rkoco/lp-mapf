@@ -11,6 +11,8 @@ import os
 
 class IncrementalSolver:
 
+    
+
     '''
     solv_type:
     0: 2 solver call with theoric delta
@@ -68,6 +70,7 @@ class IncrementalSolver:
             ctl.load("-")
 
         #self.resp = []
+
         
         step = 0
         while (step <= self.minimum_time):
@@ -100,11 +103,12 @@ class IncrementalSolver:
         ctl.ground([("base", [])])
 
         self.ground_time = time.time() - init_time
-        ret = ctl.solve(on_model=self.on_model)
+        print('grounded: {0}'.format(self.ground_time))
+        ret = ctl.solve()
         if ret.satisfiable:
             self.stats = ctl.statistics
             #self.first_stats = ctl.statistics
-            #print(json.dumps(self.stats, sort_keys=True, indent=4, separators=(',', ': ')))
+            print(json.dumps(self.stats, sort_keys=True, indent=4, separators=(',', ': ')))
 
             self.sol_cost = self.minimum_time * self.num_agents + ctl.statistics['summary']['costs'][0]
 
@@ -120,6 +124,9 @@ class IncrementalSolver:
 
             #imax = self.minimum_time + delta
             self.theoric_makespan = imax
+        #print(self.resp)
+
+
 
 
     def run_constant_delta(self, ctl, files):
@@ -141,7 +148,7 @@ class IncrementalSolver:
             for a in range(self.num_agents):
                 self.resp[a].append((0,0))
             parts = []
-            parts.append(("check", [step]))
+            #parts.append(("check", [step]))
             parts.append(("step", [step]))
 
             if step > 0:
@@ -366,7 +373,16 @@ class IncrementalSolver:
     def on_model(self,m):
         #print(m.symbols(shown=True))
         self.moved_on_goal = False
+        return
+
         for sym in m.symbols(shown=True):
+            if sym.name == "current_landmark":
+                args = sym.arguments
+                #print(args)
+                print(args[0].number,args[1].number,args[2].number)
+                #robot = int(args[0].number)
+                #self.resp[robot][args[3].number] = (args[1].number,args[2].number)
+
             if sym.name == "on":
                 args = sym.arguments
                 #print(args)

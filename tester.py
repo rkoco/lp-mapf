@@ -10,8 +10,6 @@ import time
 
 
 def run_test(solver_type, problem_folder, call_extra, only_first_sol, base_path):
-
-
     opt_makespans = []
     if solver_type == 2:
         with open('problems/original/{0}/opt_makespan'.format(problem_folder), 'r') as in_file:
@@ -198,6 +196,8 @@ def run_test(solver_type, problem_folder, call_extra, only_first_sol, base_path)
                 results.write(';'.join(map(str, row)) + '\n')
                 results.flush()
                 
+
+
             
 
             
@@ -239,7 +239,7 @@ if __name__ == '__main__':
     base_path = 'bases/baseH' 
     call_extra = False
     only_first_sol = True
-    run_test(solver_type, problem_folder, call_extra, only_first_sol, base_path)
+    run_test(solver_type, problem_folder, call_extra, False, base_path)
 
     
 

@@ -11,7 +11,7 @@ class GUI(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.problem = Problem(30)
+        self.problem = Problem(30,0,0)
         self.initUI()
 
     def initUI(self):
@@ -67,7 +67,7 @@ class GUI(QMainWindow):
         file = QFileDialog.getOpenFileName(self, 'Open file', '')
         if len(file[0]) == 0:
             return
-        self.problem = Problem(30)
+        self.problem = Problem(30,0,0)
         self.problem.read_instance(file[0])
         self.addAgentsMenu()
         self.mainFrame.redefineProblem(self.problem)
@@ -188,7 +188,8 @@ class MainFrame(QFrame):
 class MapDraw(QWidget):
 
     SquareSize = 60
-    CircleSize = 50
+    CircleSize = 35
+    GoalSize = 50
     Margin = 0
 
     def __init__(self, parent, problem):
@@ -296,39 +297,44 @@ class MapDraw(QWidget):
 
 
         center = MapDraw.SquareSize/2
-        fontSize = MapDraw.CircleSize/4
+        fontSize = MapDraw.CircleSize/2
         sqSize = MapDraw.SquareSize/3
 
         
         painter.setBrush(Qt.black)
         painter.setPen(Qt.black)
   
-        painter.drawRect(x + (center - sqSize/2), y + (center - sqSize/2), sqSize, sqSize)
+        #painter.drawRect(x + (center - sqSize/2), y + (center - sqSize/2), sqSize, sqSize)
 
 
         font = QFont()
         font.setPointSize(fontSize)
 
 
-
         painter.setFont(font)
         painter.setBrush(Qt.white)
         painter.setPen(Qt.white)
-        painter.drawText(QRectF(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize), Qt.AlignCenter|Qt.AlignCenter, 'r{0}'.format(agent_id))
+        painter.drawText(QRectF(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize), Qt.AlignCenter|Qt.AlignCenter, 'a{0}'.format(agent_id))
+
+        pen = QPen(QColor(0,0,0))
+        pen.setWidth(3);
+        painter.setPen(pen)
+        painter.setBrush(Qt.NoBrush)
+        painter.drawEllipse(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize)
 
         
 
 
 
     def drawGoal(self, painter, x, y, agent_id):
-        dif = (MapDraw.SquareSize - MapDraw.CircleSize) / 2
+        dif = (MapDraw.SquareSize - MapDraw.GoalSize) / 2
         color = self.colorTable[agent_id]
         color = QColor(color[0],color[1],color[2])
         brush = QBrush(color)
-        brush.setStyle(Qt.Dense1Pattern)
+        brush.setStyle(Qt.DiagCrossPattern)
         painter.setBrush(brush)
         painter.setPen(color)
-        painter.drawRect(x + dif, y + dif, MapDraw.CircleSize, MapDraw.CircleSize)
+        painter.drawRect(x + dif, y + dif, MapDraw.GoalSize, MapDraw.GoalSize)
 
 
 

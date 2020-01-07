@@ -4,7 +4,7 @@ import asp_solver
 import json
 
 class Problem:
-    def __init__(self, time):
+    def __init__(self, time, num_landmarks, overflow):
         self.obstacles = []
         self.map = []
         self.height = 0
@@ -33,6 +33,8 @@ class Problem:
         self.min_sum = 0
 
         self.solved = False
+        self.num_landmarks = num_landmarks
+        self.overflow = overflow
 
 
     def read_instance(self, inp):
@@ -55,7 +57,6 @@ class Problem:
 
                     x+=1
                 self.map.append(row)
-
 
             in_file.readline()
             self.num_agents = int(in_file.readline())
@@ -203,7 +204,75 @@ class Problem:
                     if v_cost == gv:
                         #If the cost is the same, the new path is equivalent and also is a best move
                         self.best_dirs[ag_id][vy][vx].append(self.dir_name[i])
+
+
+    def solve_position(self, xf, yf, depth):
+        obj = (yf, xf)
+        open_list = []
+        open_list.append(obj)
+
+        pos_costs = [[-1] * self.width for i in range(self.height)]
+        pos_costs[yf][xf] = 0
+
+        while True:
+            if not open_list:
+                break
+            u = open_list.pop(0)
+            #print(u)
+            ux = u[1]
+            uy = u[0]
+
+            #Succesors
+            if pos_costs[uy][ux] >= depth:
+                continue
+
+            for i in range(4):
+                vx = ux + self.dirX[i]
+                vy = uy + self.dirY[i]
+                
+                #Check if pos is valid:
+                if vx < self.width and vx >= 0 and vy < self.height and vy >= 0 and self.map[vy][vx] != 1:
+                    v_cost = pos_costs[uy][ux] + 1
+                    gv = pos_costs[vy][vx]
+                    if gv == -1 or v_cost < gv:
+                        pos_costs[vy][vx] = v_cost
+                        #reset the list, there is a better path
+                        open_list.append((vy,vx))
+        return pos_costs
             
+
+    def define_landmarks(self):
+        self.landmarks_pos = []
+        self.landmarks_costs = []
+        for ag in range(self.num_agents):
+            ag_cost = self.agent_cost[ag]
+            agent_step = int(ag_cost / self.num_landmarks)
+            makestep = int((self.max_time+self.overflow)/self.num_landmarks)
+
+            ag_landmarks = []
+            ag_landmarks_costs = []
+            timestep = 0
+            for lm in range(self.num_landmarks-1):
+                timestep += agent_step
+                
+                xf = self.sol[ag][timestep][0]
+                yf = self.sol[ag][timestep][1]
+                
+                ag_landmarks.append((xf,yf))
+                ag_landmarks_costs.append(self.solve_position(xf,yf,makestep))
+
+            yf = self.agents_pos[ag][2]
+            xf = self.agents_pos[ag][3]
+            ag_landmarks.append((xf,yf))
+            last_makestep = (self.max_time + self.overflow) - (makestep * (self.num_landmarks - 1))
+
+            ag_landmarks_costs.append(self.solve_position(xf,yf,last_makestep))
+
+
+            self.landmarks_pos.append(ag_landmarks)
+            self.landmarks_costs.append(ag_landmarks_costs)
+
+
 
 
     def calc_time(self):
@@ -228,7 +297,7 @@ class Problem:
         self.max_time = 0
         self.min_sum = 0
         for ag in range(self.num_agents):
-            #print('solving for ag', ag)
+            print('solving for ag', ag)
             self.solve_agent(ag)
             self.dijkstra_init(ag)
             self.agent_cost.append(0)
@@ -271,6 +340,8 @@ class Problem:
                 t+=1
 
             self.sol.append(ag_sol)
+        if self.num_landmarks > 0:
+            self.define_landmarks()
 
         self.min_sum = self.total_cost - self.max_time
         #print(self.sol)
@@ -278,22 +349,53 @@ class Problem:
         #print(self.max_time)
         self.solved = True
 
-    def write_to_lp(self, outp):
+
+    def write_to_lp_graph(self, outp):
         with open('{0}{1}.lp'.format(outp, ''), 'w') as out_file:
             print(os.path.abspath(out_file.name))
             #Write the time:
             #out_file.write('#const max_t = {0}.\n'.format(self.time))
             #out_file.write('time(1..max_t).\n\n')
 
+
             #write the map
-            out_file.write('rangeX(0..{0}).\n'.format(self.width-1))
-            out_file.write('rangeY(0..{0}).\n\n'.format(self.height-1))
+            v_id = 0
+            num_obs = 0
+            map_ids = []
+            for y in range(self.height):
+                map_row = []
+                for x in range(self.width):
+                    extra = [0,0]
+                    for ag in range(self.num_agents):
+                        if self.agents_pos[ag][0] == y and self.agents_pos[ag][1] == x:
+                            extra[0] = ag+1
 
-            out_file.write('%% Obstacles in map: \n')
-            for obs in self.obstacles:
-                out_file.write('obstacle({0},{1}).\n'.format(obs[1], obs[0]))
-            out_file.write('\n')
+                        if self.agents_pos[ag][2] == y and self.agents_pos[ag][3] == x:
+                            extra[1] = ag+1
 
+                    cell = self.map[y][x]
+                    if cell != 1:
+                        map_row.append(v_id)
+                        v_id +=1
+                    else:
+                        map_row.append(-1)
+                map_ids.append(map_row)
+
+            out_file.write('nodes(0..{0}).\n'.format(v_id))
+
+
+            for y in range(self.height):
+                for x in range(self.width):
+                    cell_id = map_ids[y][x]
+                    if cell_id != -1:
+                        if y + 1 < self.height and map_ids[y+1][x] != -1:
+                            out_file.write('connected({0},{1}).\n'.format(cell_id, map_ids[y+1][x]))
+                            out_file.write('connected({1},{0}).\n'.format(cell_id, map_ids[y+1][x]))
+                        
+                        if x + 1 < self.width and map_ids[y][x+1] != -1:
+                            out_file.write('connected({0},{1}).\n'.format(cell_id, map_ids[y][x+1]))
+                            out_file.write('connected({1},{0}).\n'.format(cell_id, map_ids[y][x+1]))
+    
 
 
             #write the agents:
@@ -302,19 +404,45 @@ class Problem:
                 out_file.write('robot({0}).\n'.format(ag))
             out_file.write('\n')
 
-            #initial positions:
-            '''
-            out_file.write('%% Initial positions:: \n')
-            for ag in range(self.num_agents):
-                out_file.write('init(r{0},{1},{2}).\n'.format(ag+1, self.agents_pos[ag][1], self.agents_pos[ag][0]))
-            out_file.write('\n')
-            '''
             
             out_file.write('%% Initial positions:: \n')
             for ag in range(self.num_agents):
-                out_file.write('on({0},{1},{2},0).\n'.format(ag, self.agents_pos[ag][1], self.agents_pos[ag][0]))
+                print(ag)
+                v_id = map_ids[self.agents_pos[ag][0]][self.agents_pos[ag][1]]
+                out_file.write('on({0},{1},0).\n'.format(ag, v_id))
             out_file.write('\n')
             
+
+
+
+            #goal positions:
+            out_file.write('%% Goal positions: \n')
+            for ag in range(self.num_agents):
+                v_id = map_ids[self.agents_pos[ag][0]][self.agents_pos[ag][1]]
+                out_file.write('goal({0},{1}).\n'.format(ag, v_id))
+            out_file.write('\n')
+
+
+
+    def write_to_lp(self, outp):
+        with open('{0}{1}.lp'.format(outp, ''), 'w') as out_file:
+            print(os.path.abspath(out_file.name))
+            #Write the time:
+            #out_file.write('#const bound = {0}.\n'.format(self.time))
+            #out_file.write('time(1..bound).\n\n')
+
+            #write the map
+            out_file.write('rangeX(0..{0}).\n'.format(self.width-1))
+            out_file.write('rangeY(0..{0}).\n\n'.format(self.height-1))
+
+
+            
+            out_file.write('%% Obstacles in map: \n')
+            for obs in self.obstacles:
+                out_file.write('obstacle({0},{1}).\n'.format(obs[1], obs[0]))
+            out_file.write('\n')
+            
+
 
 
 
@@ -326,18 +454,80 @@ class Problem:
 
 
             #dijkstra values
-            
-            
+            out_file.write('%% Dijkstra values: \n')            
             for ag in range(self.num_agents):
                 h_val = self.heuristic[ag][self.agents_pos[ag][0]][self.agents_pos[ag][1]]
                 out_file.write('dijkstra({0},{1}).\n'.format(ag, h_val))
-            out_file.write('\n\n')
+            out_file.write('\n')
+
+
+            #write the agents:
+            out_file.write('%% Agents: \n')
+            for ag in range(self.num_agents):
+                out_file.write('robot({0}).\n'.format(ag))
+            out_file.write('\n')
+
+            #initial positions:
+            
+            #out_file.write('%% Initial positions:: \n')
+            #for ag in range(self.num_agents):
+            #    out_file.write('init(r{0},{1},{2}).\n'.format(ag+1, self.agents_pos[ag][1], self.agents_pos[ag][0]))
+            #out_file.write('\n')
             
             
+            out_file.write('%% Initial positions: \n')
+            for ag in range(self.num_agents):
+                out_file.write('on({0},{1},{2},0).\n'.format(ag, self.agents_pos[ag][1], self.agents_pos[ag][0]))
+                #out_file.write('current_landmark({0},0,0).\n'.format(ag))
+            out_file.write('\n')
+            
+
+            #landmarks pos
+            if self.num_landmarks > 0:
+                out_file.write('%% Landmarks positions: \n')
+                for ag in range(self.num_agents):
+                    for lm in range(self.num_landmarks):
+                        out_file.write('landmark_pos({0},{1},{2},{3}).\n'.format(ag, self.landmarks_pos[ag][lm][0], self.landmarks_pos[ag][lm][1], lm))
+                    lm = self.num_landmarks
+                    out_file.write('landmark_pos({0},{1},{2},{3}).\n'.format(ag, self.landmarks_pos[ag][lm-1][0], self.landmarks_pos[ag][lm-1][1], lm))
+                    out_file.write('\n')
+                out_file.write('\n')
+                
+
+
+                #landmarks bounds
+                makestep = int((self.max_time+self.overflow)/self.num_landmarks)
+                out_file.write('%% Landmarks bounds: \n')
+                landmark_bound = makestep
+                for lm in range(self.num_landmarks-1):
+                    out_file.write('landmark_bound({0},{1}).\n'.format(lm, landmark_bound))
+                    landmark_bound += makestep
+
+                out_file.write('landmark_bound({0},{1}).\n'.format(self.num_landmarks-1, self.max_time+self.overflow))
+                out_file.write('landmark_bound({0},{1}).\n'.format(self.num_landmarks, self.max_time+self.overflow))
+                out_file.write('\n')
+                
+
+                
+                #landmarks costs
+                out_file.write('%% Landmarks costs: \n')
+                for ag in range(self.num_agents):
+                    for lm in range(self.num_landmarks):
+                        for y in range(self.height):
+                            for x in range(self.width):
+                                pos_cost = self.landmarks_costs[ag][lm][y][x]
+                                if pos_cost != -1:
+                                    out_file.write('landmark_cost({0},{1},{2},{3},{4}).\n'.format(ag, x, y, pos_cost ,lm))
+                                    if lm == self.num_landmarks-1:
+                                        out_file.write('landmark_cost({0},{1},{2},{3},{4}).\n'.format(ag, x, y, pos_cost ,lm+1))
+
+                        out_file.write('\n')
+                    out_file.write('\n')
 
             #min cost
             
             for ag in range(self.num_agents):
+                print(ag)
                 for y in range(self.height):
                     for x in range(self.width):
                         h1 = self.heuristic[ag][y][x]
@@ -346,7 +536,42 @@ class Problem:
                             out_file.write('cost_to_go({0},{1},{2},{3}).\n'.format(ag, x, y, h1))
                 out_file.write('\n\n')
             
+                
             
+
+
+            '''
+            for ag in range(self.num_agents):
+                posY = self.agents_pos[ag][0]
+                posX = self.agents_pos[ag][1]
+
+                t = 0
+                while True:
+                    best_dir = self.best_dirs[ag][posY][posX]
+                    if len(best_dir) > 0:
+                        best_dir = best_dir[0]
+                    else:
+                        print('????')
+                        print(ag,posY,posX,best_dir)
+
+                    if best_dir == 'left':
+                        posX -= 1
+                    elif best_dir == 'down':
+                        posY -= 1
+                    elif best_dir == 'right':
+                        posX += 1
+                    elif best_dir == 'up':
+                        posY +=1
+                    elif best_dir == 'wait':
+                        if t > self.max_time:
+                            break
+
+                    out_file.write('exec_aux({0},{1},{2}).\n'.format(ag, best_dir, t))
+                    out_file.write('on({0},{1},{2},{3}).\n'.format(ag, posX, posY, t))
+                    #print((posX,posY))
+                    #ag_sol.append((posX,posY))
+                    t+=1
+            '''
             
             
 
@@ -581,6 +806,48 @@ class Problem:
                             out_file.write('{{{0},{1}}} (-1)\n'.format(cell_id, map_ids[y][x+1]))
                             out_file.write('{{{1},{0}}} (-1)\n'.format(cell_id, map_ids[y][x+1]))
     
+    def write_to_surynek3(self, outp):
+        with open('{0}.mpf'.format(outp), 'w') as out_file:
+            out_file.write('V=\n')
+            v_id = 0
+            num_obs = 0
+
+            map_ids = []
+
+            for y in range(self.height):
+                map_row = []
+                for x in range(self.width):
+                    extra = [0,0]
+                    for ag in range(self.num_agents):
+                        if self.agents_pos[ag][0] == y and self.agents_pos[ag][1] == x:
+                            extra[0] = ag+1
+
+                        if self.agents_pos[ag][2] == y and self.agents_pos[ag][3] == x:
+                            extra[1] = ag+1
+
+                    cell = self.map[y][x]
+                    if cell != 1:
+                        out_file.write('({0},{1},{2})\n'.format(v_id,extra[0],extra[1]))
+                        map_row.append(v_id)
+                        v_id +=1
+
+                    else:
+                        num_obs += 1
+                        map_row.append(-1)
+
+                map_ids.append(map_row)
+            print(num_obs)
+
+            out_file.write('E=\n')
+            for y in range(self.height):
+                for x in range(self.width):
+                    cell_id = map_ids[y][x]
+                    if cell_id != -1:
+                        if y + 1 < self.height and map_ids[y+1][x] != -1:
+                            out_file.write('{{{0},{1}}}\n'.format(cell_id, map_ids[y+1][x]))
+                        
+                        if x + 1 < self.width and map_ids[y][x+1] != -1:
+                            out_file.write('{{{0},{1}}}\n'.format(cell_id, map_ids[y][x+1]))
 
 
 

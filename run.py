@@ -5,8 +5,11 @@ import lp_generator
 import time
 
 
-def run(problem_path, lp_path, base_path):
-        problem = lp_generator.Problem(50)
+def run(problem_path, lp_path, base_path, landmarks, overflow):
+        num_landmarks = int(landmarks)
+        num_overflow = int(overflow)
+
+        problem = lp_generator.Problem(50, num_landmarks, num_overflow)
         print('reading instance')
         problem.read_instance(problem_path)
         print('generating solution')
@@ -15,15 +18,29 @@ def run(problem_path, lp_path, base_path):
         problem.write_to_lp(lp_path)
         
         print('Solving with clingo...')
+        return
 
         start_time = time.time()
-        num_makespan = problem.max_time
+        num_makespan = problem.max_time + num_overflow
         ground_time = 0
         runtime = 0
         first_solved = False
         solved = False
 
         curr_time = 300
+        print(num_makespan)
+
+        solv0 = asp_solver.IncrementalSolver('{0}.lp'.format(lp_path), num_makespan, problem.num_agents, problem.min_sum, problem.total_cost, 4, True)
+        clingo.clingo_main(solv0, ['{0}.lp'.format(lp_path), '{0}'.format(base_path), '--time-limit={0}'.format(curr_time), 
+            '-t', '4', '-c','bound={0}'.format(num_makespan), '-c' ,'lbound={0}'.format(num_landmarks), '--opt-strategy=usc,disjoint', '--text'] )
+        print(solv0.resp)
+        print('found solution: ')
+        print('\t total_cost: {0}'.format(solv0.sol_cost))
+        #print('\t makespan: {0}'.format(check_makespan(solv.resp)))
+
+
+        return
+
         while curr_time >= 0:
 
             print('solving with makespan: {0}'.format(num_makespan+1))
@@ -63,8 +80,9 @@ def run(problem_path, lp_path, base_path):
         if solved:
             print('found solution: ')
             print('\t total_cost: {0}'.format(solv.sol_cost))
-            print('\t makespan: {0}'.format(check_makespan(solv.resp)))
+            #print('\t makespan: {0}'.format(check_makespan(solv.resp)))
             print('\t runtime: {0} seconds'.format(runtime))
+            print('\t ground_time: {0} seconds'.format(ground_time))
         else:
             print('No solution found')
 
@@ -94,4 +112,4 @@ def check_makespan(sol):
 
 
 if __name__ == '__main__':
-    run(sys.argv[1], sys.argv[2], sys.argv[3])
+    run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
