@@ -1,0 +1,3 @@
+sep=;
+Instance; First_solved;solved;;1stOPT;1stSOL-COST;1stMakespan;1stTheoricMakespan;1stRunTime;1stGroundTime;1stGroundPerc;1stAtoms;1stBodies;1stRules;1stTotal;;OPT;SOL-COST;Makespan;TheoricMakespan;RunTime;GroundTime;GroundPerc;Atoms;Bodies;Rules;Total
+Instance-20-10-38-9;1;1;	;543,0;543,0;-1;27;58,39694404602051;25,960155963897705;44,45464807788478;257561,0;12598128,0;12658060,0;25513749,0;	;543,0;543,0;-1;27;127,42782783508301;55,7901406288147;43,781755976424755;275612,0;13786853,0;13851321,0;27913786,0
