@@ -1,0 +1,3 @@
+Instance; First_solved;solved;;1stOPT;1stSOL-COST;1stMakespan;1stTheoricMakespan;1stRunTime;1stGroundTime;1stGroundPerc;1stAtoms;1stBodies;1stRules;1stTotal;;OPT;SOL-COST;Makespan;TheoricMakespan;RunTime;GroundTime;GroundPerc;Atoms;Bodies;Rules;Total
+Instance-20-10-50-5;1;0;"	";-676;724;-1;50;14,58347631;6,774425507;46,45274806;127133;3032082;3734765;6893980;"	";;;;;;;;;;;
+Instance-20-10-50-6;1;0;"	";-852;748;-1;49;40,47869992;17,70175171;43,73102828;180468;6357566;7810441;14348475;"	";;;;;;;;;;;
