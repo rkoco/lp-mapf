@@ -1,0 +1,185 @@
+\newcommand{\C}[1]{\ensuremath{\mathcal{#1}}\xspace}
+\newcommand{\R}{\C{R}}
+\newcommand{\D}{\C{D}}
+
+
+
+\newcommand{\Deff}{\ensuremath{\C{D}_\mathit{eff}}\xspace}
+\newcommand{\Dssa}{\ensuremath{\C{D}_\mathit{ssa}}\xspace}
+\newcommand{\Dpr}{\ensuremath{\C{D}_\mathit{ap}}\xspace}
+\newcommand{\Dnpr}{\ensuremath{\C{D}_\mathit{nap}}\xspace}
+\newcommand{\Duna}{\ensuremath{\C{D}_\mathit{una}}\xspace}
+\newcommand{\Dso}{\ensuremath{\C{D}_{S_0}}\xspace}
+\newcommand{\Kinit}{\ensuremath{\C{K}_\mathit{init}}\xspace}
+
+% first-order aliases
+\newcommand{\x}{\ensuremath{\vec{x}}}
+\newcommand{\y}{\ensuremath{\vec{y}}}
+\newcommand{\Ex}[1]{\ensuremath{(\exists #1)\,}}
+\newcommand{\fall}[1]{\ensuremath{(\forall #1)\,}}
+\newcommand{\Exd}[1]{\ensuremath{(\exists #1).\,}}
+\newcommand{\falld}[1]{\ensuremath{(\forall #1).\,}}
+\newcommand{\Lang}{\C{L}\xspace}
+\newcommand{\LangFO}{\C{L}_{FO}\xspace}
+\newcommand{\Vars}{\ensuremath{\mathrm{Vars}}}
+
+
+\newcommand{\subst}{\ensuremath{\mathtt{subst}}}
+
+\newcommand{\eqdef}{\ensuremath{\overset{\text{def}}{=}}}
+
+\newcommand{\proofstring}{Proof}
+%\newcommand{\proof}{\noindent\textbf{\proofstring:}\xspace}
+\newcommand{\proofsketch}{\noindent\textbf{Proof sketch:}\xspace}
+\newenvironment{pf}[1][]{\noindent\textbf{\proofstring\ifthenelse{\equal{#1}{}}{:}{~(#1) :}}\xspace}{\hfill\QED\medskip}
+
+\newcommand{\base}{\noindent\textit{Base case:}\xspace}
+\newcommand{\bases}{\noindent\textit{Base cases:}\xspace}
+\newcommand{\induction}{\noindent\textit{Induction:}\xspace}
+\newcommand{\QED}{\hfill$\blacksquare$\vspace{0pt}}
+\newcommand{\GIF}[3]{\ensuremath{\mathbf{if}~#1~\mathbf{then}~#2~\mathbf{else}~#3~\mathbf{endIf}}}
+\newcommand{\GWHILE}[3][]{\ensuremath{\mathbf{while}_{#1}~#2~\mathbf{do}~#3~\mathbf{endWhile}}}
+\newcommand{\GPROC}[2]{\ensuremath{\mathbf{proc}~#1~#2~\mathbf{endProc}}}
+
+\newcommand{\scomment}[1]{[\textsl{#1}]}
+\newcommand{\golog}{Golog\xspace}
+\newcommand{\eagle}{\textsc{EaGle}\xspace}
+\newcommand{\predeq}{\sqsubseteq}
+\newcommand{\pred}{\sqsubset}
+
+
+
+\newcommand{\SC}{Situation Calculus\xspace}
+
+
+% \newtheorem{theorem}{Theorem}[chapter]
+% \newtheorem{lemma}{Lemma}[chapter]
+% \newtheorem{corollary}{Corollary}[chapter]
+% \newtheorem{remark}{Remark}[chapter]
+% \newtheorem{proposition}{Proposition}[chapter]
+% {\theorembodyfont{\rmfamily}\newtheorem{example}{Example}[chapter]}
+% \newtheorem{definition}{Definition}[chapter]
+
+\newcommand{\angled}[1]{\ensuremath{\langle #1\rangle}}
+\newcommand{\comment}[1]{\textbf{[#1]}} 
+
+%% LTL operators
+\newcommand{\final}{\ensuremath{\mathsf{final}}\xspace}
+\newcommand{\true}{\ensuremath{\mathsf{true}}\xspace}
+\newcommand{\false}{\ensuremath{\mathsf{false}}\xspace}
+\newcommand{\until}{\ensuremath{\operatorname{\mathsf{U}}}}
+\newcommand{\release}{\ensuremath{\operatorname{\mathsf{R}}}}
+%\newcommand{\next}{\ensuremath{{\scriptstyle \bigcirc}}}
+
+\def\next{\raise1.4pt\hbox{$\scriptstyle\bigcirc$}}
+
+\newcommand{\Al}{\ensuremath{\Box}}
+\newcommand{\Ev}{\ensuremath{\Diamond}}
+
+%\newcommand{\acite}[1]{\citeauthor{#1}~\shortcite{#1}}
+\newcommand{\acite}[1]{\citeA{#1}}
+\newcommand{\ascite}[1]{\shortciteA{#1}}
+%\renewcommand{\cite}[1]{\citep{#1}}
+
+\newcommand{\Paragraph}[1]{\smallskip\noindent\textbf{#1}}
+
+\newcommand{\PBS}[1]{\let\temp=\\#1\let\\=\temp}
+\newcommand{\fs}[1]{\fontsize{#1}{#1}\selectfont}
+\newenvironment{program}{\smallskip\begin{singlespaced}\begin{small}\begin{alltt}}%
+  {\end{alltt}\end{small}\end{singlespaced}\smallskip}
+
+
+
+\newcommand{\bestMetric}{\ensuremath{\mathit{bestMetric}}}
+
+
+\newcommand{\strips}{\textsc{STRIPS}\xspace}
+\newcommand{\adl}{\textsc{ADL}\xspace}
+
+%% planning systems
+
+\newcommand{\fltl}{{\rmfamily f}-\textsc{FOLTL}\xspace}
+\newcommand{\ffx}{FF$_\C{X}$\xspace}
+\newcommand{\ctlplan}{\textsc{TLPlan-C}\xspace}
+\newcommand{\unpop}{\textsc{unpop}\xspace}
+\newcommand{\tlplan}{\textsc{TLPlan}\xspace}
+\newcommand{\talplan}{\textsc{TALPlan}\xspace}
+\newcommand{\talplanner}{\textsc{TALPlan}\xspace}
+\newcommand{\hplanp}{\textsc{HPlan-P}\xspace}
+\newcommand{\hplanqp}{\textsc{HPlan-QP}\xspace}
+\newcommand{\sgplanV}{SGPlan$_5$\xspace}
+\newcommand{\yochanps}{\textsl{Yochan}$^\mathcal{PS}$\xspace}
+\newcommand{\bbop}{\textsc{bbop-lp}\xspace}
+\newcommand{\mipsbdd}{\textsc{mips-bdd}\xspace}
+\newcommand{\mipsxxl}{\textsc{mips-xxl}\xspace}
+\newcommand{\ff}{\textsc{ff}\xspace}
+\newcommand{\metricff}{\textsc{Metric-FF}\xspace}
+\newcommand{\hsp}{\textsc{hsp}\xspace}
+\newcommand{\marvin}{\textsc{Marvin}\xspace}
+\newcommand{\graphplan}{\textsc{Graphplan}\xspace}
+\newcommand{\pplan}{\textsc{PPlan}\xspace}
+\newcommand{\satplan}{\textsc{Satplan}\xspace}
+\newcommand{\satplanp}{\textsc{Satplan-P}\xspace}
+\newcommand{\pp}{$PP$\xspace}
+\newcommand{\lpp}{$LPP$\xspace}
+\newcommand{\bongefplanner}{\textsc{BG-KComp}\xspace}
+
+
+%% golog macros
+\newcommand{\gif}{\ensuremath{\mathbf{if}\,}\xspace}
+\newcommand{\gthen}{\ensuremath{\,\mathbf{then}\,}\xspace}
+\newcommand{\gelse}{\ensuremath{\,\mathbf{else}\,}\xspace}
+\newcommand{\gendif}{\ensuremath{\,\mathbf{fi}\,}\xspace}
+\newcommand{\gwhile}{\ensuremath{\mathbf{while}\,}\xspace}
+\newcommand{\gdo}{\ensuremath{\,\mathbf{do}\,}\xspace}
+\newcommand{\gendwhile}{\ensuremath{\,\mathbf{end}}\xspace}
+
+%% macros for h-ops heuristics
+\newcommand{\gtest}[1]{\ensuremath{\mathbf{test}(#1)}\xspace}
+\newcommand{\gtestesc}[2]{\ensuremath{\mathbf{testesc}(#1)}\xspace}
+\newcommand{\gtestescif}[1]{\ensuremath{\mathbf{testesc}(#1)}\xspace}
+\newcommand{\gexitif}{\ensuremath{\mathbf{exitif}}\xspace}
+\newcommand{\gcontinue}{\ensuremath{\mathbf{continue}}\xspace}
+\newcommand{\gnoop}{\ensuremath{\mathbf{noop}}\xspace}
+\newcommand{\gesc}[1]{\ensuremath{\mathbf{escape\_#1}}\xspace}
+
+
+
+
+
+
+%% other commands
+
+\newcommand{\sdsh}{\text{-}}
+\newcommand{\mathreadable}[1]{\ensuremath{\mathit{#1}}}
+\newcommand{\isviolated}{\ensuremath{\mathtt{is\sdsh violated}}\xspace}
+\newcommand{\totaltime}{\ensuremath{(\mathtt{total\sdsh time})}\xspace}
+\newcommand{\length}{\ensuremath{\mathtt{length}}\xspace}
+\newcommand{\I}{\ensuremath{\mathcal{I}}\xspace}
+
+\newcommand{\RelGraph}[3]{\ensuremath{(#1,#2)}}
+\newcommand{\relgraph}{\RelGraph{F^+_k}{F^-_k}{s}}
+
+\newcommand{\relgraphi}[1]{\ensuremath{(F^+_{#1},F^-_{#1})}}
+
+\newcommand{\node}{\ensuremath{N}\xspace}
+
+%% SHEILA EXTRA
+\newcommand{\mif}{{\bf if}~}
+\newcommand{\mwhile}{{\bf while}~}
+\newcommand{\mreturn}{{\bf return}}
+\newcommand{\mthen}{{\bf then}~}
+\newcommand{\melse}{{\bf else}~}
+\newcommand{\mdo}{{\bf do}~}
+\newcommand{\mendif}{{\bf endIf}}
+\newcommand{\mendwhile}{{\bf endWhile}}
+
+\newcommand{\update}{\texttt{Update()}\xspace}
+\newcommand{\extractbest}{\texttt{Extract-Best()}\xspace}
+\newcommand{\snext}{\ensuremath{s_{next}}}
+\newcommand{\sstart}{\ensuremath{s_{\mathit{start}}}\xspace}
+\newcommand{\saux}{\ensuremath{s_{\mathit{aux}}}\xspace}
+\newcommand{\sinit}{\ensuremath{s_{\mathit{init}}}\xspace}
+\newcommand{\sgoal}{\ensuremath{s_{\mathit{goal}}}\xspace}
+\newcommand{\parent}{\ensuremath{parent}}
+\newcommand{\counter}{\ensuremath{counter}}

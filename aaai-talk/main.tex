@@ -1,0 +1,831 @@
+\documentclass{article}
+\usepackage{aaai}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{times}
+\usepackage{theorem}
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{amssymb}
+\usepackage{graphicx}
+%\usepackage{tikz}
+\usepackage{array}
+\usepackage{multirow}
+%\usepackage{subfigure}
+\usepackage{algcompatible}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{pgf}
+%\usepackage{algorithm}
+
+%\input{macros}
+
+%\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+%\noindent\keywordname\enspace\ignorespaces#1}
+
+\newcommand{\jbcomment}[1]{\textbf{[#1]}}
+%\newcommand{\jbcomment}[1]{}
+ 
+% \newcommand{\C}[1]{\ensuremath{\mathcal{#1}}\xspace}
+% \newcommand{\R}{\C{R}}
+% \newcommand{\D}{\C{D}}
+% %\newcommand{\nnfev}{\models_{\mathsf{rg}}}
+% \newcommand{\nnfev}{\models{\kern-.8em\lower.9ex\hbox{\rm\scriptsize\textsf{rg}}}}
+% %u\kern-.56em\lower.3ex\mbox{2}
+
+% \newcommand{\Deff}{\ensuremath{\C{D}_\mathit{eff}}\xspace}
+% \newcommand{\Dpr}{\ensuremath{\C{D}_\mathit{ap}}\xspace}
+% \newcommand{\Dnpr}{\ensuremath{\C{D}_\mathit{nap}}\xspace}
+% \newcommand{\Duna}{\ensuremath{\C{D}_\mathit{una}}\xspace}
+% \newcommand{\Dso}{\ensuremath{\C{D}_{S_0}}\xspace}
+% \newcommand{\Kinit}{\ensuremath{\C{K}_\mathit{init}}\xspace}
+
+% % first-order aliases
+% \newcommand{\x}{\ensuremath{\vec{x}}}
+% \newcommand{\y}{\ensuremath{\vec{y}}}
+% \newcommand{\Ex}[1]{\ensuremath{(\exists #1)\,}}
+% \newcommand{\fall}[1]{\ensuremath{(\forall #1)\,}}
+% \newcommand{\Exd}[1]{\ensuremath{(\exists #1).\,}}
+% \newcommand{\falld}[1]{\ensuremath{(\forall #1).\,}}
+% \newcommand{\Lang}{\C{L}\xspace}
+% \newcommand{\LangFO}{\C{L}_{FO}\xspace}
+% \newcommand{\Vars}{\ensuremath{\mathrm{Vars}}}
+% \newcommand{\QPrefix}{\ensuremath{\mathsf{QPrefix}}\xspace}
+% \newcommand{\Tempmembers}{\ensuremath{\Upsilon}\xspace}
+% \newcommand{\ground}{\ensuremath{\mathsf{ground}}\xspace}
+
+% \newcommand{\SCond}{\ensuremath{\mathsf{SensedCond}}\xspace}
+
+% \newcommand{\subst}{\ensuremath{\mathtt{subst}}}
+
+% \newcommand{\eqdef}{\ensuremath{\overset{\text{def}}{=}}}
+
+\newcommand{\proofstring}{Proof}
+%\newcommand{\proof}{\noindent\textbf{\proofstring:}\xspace}
+\newcommand{\proofsketchstring}{Proof sketch}
+\newcommand{\proofsketch}{\noindent\textbf{\proofsketchstring:}\xspace}
+\newenvironment{pf}[1][]{\noindent\textbf{\proofstring\ifthenelse{\equal{#1}{}}{:}{~(#1) :}}\xspace}{\hfill\QED\medskip\par}
+\newenvironment{pfsketch}[1][]{\noindent\textbf{\proofsketchstring\ifthenelse{\equal{#1}{}}{:}{~(#1) :}}\xspace}{\hfill\QED\medskip\par}
+
+% \newcommand{\base}{\noindent\textit{Base case:}\xspace}
+% \newcommand{\bases}{\noindent\textit{Base cases:}\xspace}
+% \newcommand{\induction}{\noindent\textit{Induction:}\xspace}
+\newcommand{\QED}{\hfill$\blacksquare$\vspace{0pt}}
+% \newcommand{\GIF}[3]{\ensuremath{\mathbf{if}~#1~\mathbf{then}~#2~\mathbf{else}~#3~\mathbf{endif}}}
+% \newcommand{\GWHILE}[3][]{\ensuremath{\mathbf{while}_{#1}~#2~\mathbf{do}~#3~\mathbf{endwhile}}}
+% \newcommand{\scomment}[1]{{\bfseries [\textsl{#1}]}}
+% \newcommand{\golog}{Golog\xspace}
+% \newcommand{\eagle}{\textsc{EaGle}\xspace}
+% \newcommand{\predeq}{\sqsubseteq}
+% \newcommand{\pred}{\sqsubset}
+
+
+
+% \newcommand{\SC}{Situation Calculus\xspace}
+
+
+ \newtheorem{theorem}{Theorem}
+ \newtheorem{lemma}{Lemma}
+ \newtheorem{corollary}{Corollary}
+ \newtheorem{remark}{Remark}
+\newtheorem{proposition}{Proposition}
+% \theorembodyfont{\rmfamily}{\newtheorem{example}{Example}}
+\newtheorem{definition}{Definition}
+
+\newcommand{\angled}[1]{\ensuremath{\langle #1\rangle}}
+%\newcommand{\comment}[1]{\textbf{[#1]}} 
+
+%% LTL operators
+\newcommand{\final}{\ensuremath{\mathsf{final}}\xspace}
+\newcommand{\true}{\ensuremath{\mathsf{true}}\xspace}
+\newcommand{\false}{\ensuremath{\mathsf{false}}\xspace}
+\newcommand{\until}{\ensuremath{\operatorname{\mathsf{U}}}}
+\newcommand{\release}{\ensuremath{\operatorname{\mathsf{R}}}}
+%\newcommand{\next}{\ensuremath{{\scriptstyle \bigcirc}}}
+
+\def\next{\raise1.4pt\hbox{$\scriptstyle\bigcirc$}}
+
+\newcommand{\Al}{\ensuremath{\Box}}
+\newcommand{\Ev}{\ensuremath{\Diamond}}
+
+\newcommand{\acite}[1]{\citeauthor{#1}~\shortcite{#1}}
+\newcommand{\nbcite}[1]{\citeauthor{#1}~\citeyear{#1}}
+% theapa alias:
+%\newcommand{\acite}[1]{\citeauthor{#1}~\cite{#1}}
+%\newcommand{\acite}[1]{\cite{#1}}
+%\newcommand{\citeauthor}[1]{\cite{#1}}
+
+%% natbib aliases:
+%\newcommand{\acite}[1]{\citet{#1}}
+\makeatletter
+%\DeclareRobustCommand{\cite}{\@ifnextchar<{\@jbcite}{\@jbcite<>}}
+%\def\@jbcite<#1>{\@ifnextchar[{\@@jbcite<#1>}{\@@jbcite<#1>[]}}
+%\def\@@jbcite<#1>[#2]#3{\protect\citep[#1][#2]{#3}}
+%\def\citeS{\@ifnextchar[{\@jbciteS}{\@jbciteS[]}}
+%\def\citeR#1{\citealp{#1}}
+%\def\@jbciteS[#1]#2{\citeauthor{#2}'s #1 \cite{#2}}
+%\def\@jbciteS[#1]#2{arg1=#1 arg2=#2}}
+\makeatother
+
+%\setcitestyle{round} 
+ 
+ 
+\newcommand{\Paragraph}[1]{\noindent\textbf{#1}\hspace{.8em}}
+
+\newcommand{\PBS}[1]{\let\temp=\\#1\let\\=\temp}
+\newcommand{\fs}[1]{\fontsize{#1}{#1}\selectfont}
+\newenvironment{program}{\smallskip\begin{singlespaced}\begin{small}\begin{alltt}}%
+  {\end{alltt}\end{small}\end{singlespaced}\smallskip}
+
+
+
+\newcommand{\bestMetric}{\ensuremath{\mathit{bestMetric}}}
+
+
+\newcommand{\strips}{\textsc{STRIPS}\xspace}
+\newcommand{\adl}{\textsc{ADL}\xspace}
+
+%% planning systems
+
+\newcommand{\fltl}{{\rmfamily f}-\textsc{FOLTL}\xspace}
+\newcommand{\ffx}{FF$_\C{X}$\xspace}
+\newcommand{\ctlplan}{\textsc{TLPlan-C}\xspace}
+\newcommand{\unpop}{\textsc{unpop}\xspace}
+\newcommand{\tlplan}{\textsc{TLPlan}\xspace}
+\newcommand{\talplan}{\textsc{TALPlan}\xspace}
+\newcommand{\talplanner}{\textsc{TALPlan}\xspace}
+\newcommand{\hplanp}{\textsc{HPlan-P}\xspace}
+\newcommand{\hplanqp}{\textsc{HPlan-QP}\xspace}
+\newcommand{\sgplanV}{SGPlan$_5$\xspace}
+\newcommand{\yochanps}{\textsl{Yochan}$^\mathcal{PS}$\xspace}
+\newcommand{\bbop}{\textsc{bbop-lp}\xspace}
+\newcommand{\mipsbdd}{\textsc{mips-bdd}\xspace}
+\newcommand{\mipsxxl}{\textsc{mips-xxl}\xspace}
+\newcommand{\ff}{FF\xspace}
+\newcommand{\hff}{\ensuremath{h^\ff}\xspace}
+\newcommand{\metricff}{\textsc{Metric-FF}\xspace}
+\newcommand{\hsp}{\textsc{hsp}\xspace}
+\newcommand{\marvin}{\textsc{Marvin}\xspace}
+\newcommand{\graphplan}{\textsc{Graphplan}\xspace}
+\newcommand{\pplan}{\textsc{PPlan}\xspace}
+\newcommand{\satplan}{\textsc{Satplan}\xspace}
+\newcommand{\satplanp}{\textsc{Satplan-P}\xspace}
+\newcommand{\lama}{LAMA\xspace}
+\newcommand{\fd}{\textsc{Fast-Downward}\xspace}
+\newcommand{\pp}{$PP$\xspace}
+\newcommand{\lpp}{$LPP$\xspace}
+\newcommand{\bongefplanner}{\textsc{BG-KComp}\xspace}
+
+
+%% golog macros
+\newcommand{\gif}{\ensuremath{\mathbf{if}\,}\xspace}
+\newcommand{\gthen}{\ensuremath{\,\mathbf{then}\,}\xspace}
+\newcommand{\gelse}{\ensuremath{\,\mathbf{else}\,}\xspace}
+\newcommand{\gendif}{\ensuremath{\,\mathbf{fi}\,}\xspace}
+\newcommand{\gwhile}{\ensuremath{\mathbf{while}\,}\xspace}
+\newcommand{\gdo}{\ensuremath{\,\mathbf{do}\,}\xspace}
+\newcommand{\gendwhile}{\ensuremath{\,\mathbf{end}}\xspace}
+
+%% macros for h-ops heuristics
+\newcommand{\gtest}[1]{\ensuremath{\mathbf{test}(#1)}\xspace}
+\newcommand{\gtestesc}[2]{\ensuremath{\mathbf{testesc}(#1)}\xspace}
+\newcommand{\gtestescif}[1]{\ensuremath{\mathbf{testesc}(#1)}\xspace}
+\newcommand{\gexitif}{\ensuremath{\mathbf{exitif}}\xspace}
+\newcommand{\gcontinue}{\ensuremath{\mathbf{continue}}\xspace}
+\newcommand{\gnoop}{\ensuremath{\mathbf{noop}}\xspace}
+\newcommand{\gesc}[1]{\ensuremath{\mathbf{escape\_#1}}\xspace}
+
+
+%% preference commands
+\newcommand{\prefeq}{\ensuremath{\preceq}\xspace}
+\newcommand{\pref}{\ensuremath{\prec}\xspace}
+
+
+
+%% other commands
+
+\newcommand{\sdsh}{\text{-}}
+\newcommand{\dash}{\text{-}}
+\newcommand{\mathreadable}[1]{\ensuremath{\mathit{#1}}}
+\newcommand{\isviolated}{\ensuremath{\mathtt{is\sdsh violated}}\xspace}
+\newcommand{\totaltime}{\ensuremath{(\mathtt{total\sdsh time})}\xspace}
+\newcommand{\length}{\ensuremath{\mathtt{length}}\xspace}
+\newcommand{\I}{\ensuremath{\mathcal{I}}\xspace}
+
+
+\newcommand{\plansat}{\textsc{PlanSat}\xspace}
+\newcommand{\planmin}{\textsc{PlanMin}\xspace}
+
+
+\newcommand{\RelGraph}[3]{\ensuremath{(#1,#2)}}
+\newcommand{\relgraph}{\RelGraph{F^+_k}{F^-_k}{s}}
+
+\newcommand{\relgraphi}[1]{\ensuremath{(F^+_{#1},F^-_{#1})}}
+
+\newcommand{\node}{\ensuremath{N}\xspace}
+
+
+\newcommand{\pddltoltl}{\ensuremath{\mathsf{ToLTL}}\xspace}
+
+%% SHEILA EXTRA
+\newcommand{\mif}{{\bf if}~}
+\newcommand{\mwhile}{{\bf while}~}
+\newcommand{\mreturn}{{\bf return}}
+\newcommand{\mthen}{{\bf then}~}
+\newcommand{\melse}{{\bf else}~}
+\newcommand{\mdo}{{\bf do}~}
+\newcommand{\mendif}{{\bf endIf}}
+\newcommand{\mendwhile}{{\bf endWhile}}
+
+% complexity classes
+
+\newcommand{\complexityclass}[1]{{\rm\textsf{#1}}\xspace}
+\newcommand{\Pclass}{\complexityclass{P}}
+\newcommand{\PSPACE}{\complexityclass{PSPACE}}
+\newcommand{\NPSPACE}{\complexityclass{NPSPACE}}
+\newcommand{\APX}{\complexityclass{APX}}
+\newcommand{\EXPSPACE}{\complexityclass{EXPSPACE}}
+\newcommand{\EXPTIME}{\complexityclass{EXPTIME}}
+\newcommand{\NP}{\complexityclass{NP}}
+
+
+% search algorithms
+\newcommand{\LSSw}{LSS-LRT$w$A*\xspace}
+\newcommand{\LSS}{LSS-LRTA*\xspace}
+\newcommand{\LS}{LRTA*-LS\xspace}
+\newcommand{\LSw}{LRT$w$A*-LS\xspace}
+\newcommand{\wLSS}{$w$LSS-LRTA*\xspace}
+\newcommand{\wLS}{$w$LRTA*-LS\xspace}
+\newcommand{\argmin}{\operatorname{arg}\min}
+
+\newcommand{\Succ}{\ensuremath{Succ}}
+
+\newcommand{\lrta}{LRTA*\xspace}
+\newcommand{\flrta}{$f$-\lrta\xspace}
+\newcommand{\elrta}{aLSS-LRTA*\xspace}
+\newcommand{\alrta}{aLSS-LRTA*\xspace}
+\newcommand{\dalrta}{daLSS-LRTA*\xspace}
+\newcommand{\lsslrta}{LSS-LRTA*\xspace}
+\newcommand{\lrtaau}{HA-LSS-LRTA*\xspace}
+\newcommand{\prta}{PRTA*\xspace}
+\newcommand{\pprta}{pPRTA*\xspace}
+\newcommand{\rta}{RTA*\xspace}
+\newcommand{\tba}{TBA*\xspace}
+\newcommand{\lrtak}{LRTA$^*(k)$\xspace}
+\newcommand{\lrtalsk}{LRTA$_\text{LS}^*(k)$\xspace}
+\newcommand{\rtaa}{RTAA*\xspace}
+\newcommand{\artaa}{aRTAA*\xspace}
+\newcommand{\dartaa}{daRTAA*\xspace}
+\newcommand{\astar}{A*\xspace}
+\newcommand{\dstar}{D*\xspace}
+
+
+% Other aliases for algorithms
+\newcommand{\closed}{\ensuremath{Closed}\xspace}
+\newcommand{\open}{\ensuremath{Open}\xspace}
+\newcommand{\scurr}{\ensuremath{s_{current}}}
+\newcommand{\updated}{\textsf{updated}\xspace}
+\newcommand{\multiqastar}{A*\xspace}
+\newcommand{\initstate}{\ensuremath{\mathit{InitializeState}}}
+
+
+\newcommand{\techreport}[1]{#1}
+\newcommand{\shortpaper}[1]{}
+
+\newcommand{\smallboldfacenumber}{\tiny\bfseries}
+
+\newcommand{\update}{\texttt{Update()}\xspace}
+\newcommand{\extractbest}{\texttt{Extract-Best()}\xspace}
+\newcommand{\snext}{\ensuremath{s_{next}}}
+\newcommand{\sstart}{\ensuremath{s_{\mathit{start}}}\xspace}
+\newcommand{\saux}{\ensuremath{s_{\mathit{aux}}}\xspace}
+\newcommand{\sinit}{\ensuremath{s_{\mathit{init}}}\xspace}
+\newcommand{\sgoal}{\ensuremath{s_{\mathit{goal}}}\xspace}
+\newcommand{\scurrent}{\ensuremath{s_{\mathit{current}}}\xspace}
+\newcommand{\parent}{\ensuremath{parent}}
+\newcommand{\counter}{\ensuremath{counter}}
+\newcommand{\expansions}{\ensuremath{\mathit{expansions}}\xspace}
+\newcommand{\searchnumber}{\ensuremath{\mathit{searchnumber}}\xspace}
+\newcommand{\search}{\ensuremath{\mathit{search}}\xspace}
+
+
+
+\newcommand{\LF}{\ensuremath{\mathit{lookaheadFlag}}\xspace}
+\newcommand{\GFF}{\ensuremath{\mathit{goalFound}}\xspace}
+
+\newcommand{\OPEN}{\ensuremath{\mathit{Open}}\xspace}
+\newcommand{\CLOSED}{\ensuremath{\mathit{Closed}}\xspace}
+\newcommand{\OBS}{\mbox{\it Obstacles}}
+
+\newcommand{\Next}{\mbox{\it Next}}
+\newcommand{\Parent}{\parent}
+\newcommand{\deltacl}{\ensuremath{\delta_{\CLOSED}}}
+\newcommand{\restart}{\ensuremath{\mathit{restart}}}
+\newcommand{\Tinc}{\ensuremath{E^{\mathit{inc}}}\xspace}
+\newcommand{\Tdec}{\ensuremath{E^{\mathit{dec}}}\xspace}
+\newcommand{\Tupd}{\ensuremath{V^{\mathit{upd}}}\xspace}
+\newcommand{\pathtogoal}{\ensuremath{\mathit{pathToGoal}}\xspace}
+
+\begin{document}
+
+%\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{Improving MPGAA* for Extended Visibility Ranges}
+
+ \author{ 
+   Carlos Hern\'andez\\
+   Depto.\ de Ciencias de la Ingenier\'ia\\
+   Universidad Andr\'es Bello \\
+   Santiago, Chile
+   \And
+ Jorge A.\ Baier \\
+ Departamento de Ciencia de la Computaci\'{o}n\\
+ Pontificia Universidad Cat\'olica de Chile \\%ontificia Universidad Cat\'{o}lica de Chile\\
+ Santiago, Chile
+ }
+
+
+\pdfinfo{
+/Title (Improving MPGAA* for Extended Visibility Ranges)
+/Author (Carlos Hernandez, Jorge A. Baier)
+}
+
+
+\maketitle
+
+
+\begin{abstract}
+Multipath Generalized Adaptive A* (MPGAA*) is an A*-based incremental
+search algorithm for dynamic terrain that can outperform D* for the (realistic) case of limited visibility ranges.
+%For larger visibility ranges, it was known that D* was still superior
+%to MPGAA*.
+A first contribution of this paper is a brief analysis studying why MPGAA* has poor performance for extended visibility ranges, which concludes that
+MPGAA* carries out an excessive number of heuristic updates. Our second
+contribution is a method to reduce the number of heuristic updates that
+preserves optimality. Finally, a third contribution is a variant of MPGAA*, MPGAA*-back, which we show outperforms MPGAA* and D* on a wide range of dynamic grid pathfinding scenarios, and visibility ranges.
+\end{abstract}
+
+% Squeezing
+
+%\setlength\textfloatsep{0.5cm} 
+%\setlength\abovecaptionskip{0.15cm}
+%\setlength\dbltextfloatsep{0.1cm}
+%\setlength\theorempreskipamount{2pt plus 1pt minus 1pt}
+%\setlength\theorempostskipamount{1pt plus 1pt minus 1pt}
+%\renewcommand{\topfraction}{0.95}
+%\renewcommand{\textfraction}{0.05}
+%\renewcommand{\floatpagefraction}{0.95} 
+
+\section{Introduction}
+% Planning and execution are two phases that need to be considered for the implementation of intelligent agents. During execution, one may want to guarantee that the agent is always performing the best possible plan that leads to the goal based on the current knowledge of the agent.
+Incremental Heuristic Search (IHS) is a well-established sub-area of Heuristic Search whose objective is the development of algorithms capable of deciding the actions that lead an agent from a given initial state to a given goal state in a dynamic, changing environment.
+% As such, these algorithms perform offline planning, monitor plan optimality during execution, and replan when needed.
+
+Goal directed navigation, the problem of moving an agent from one cell to another over a grid, is an application domain of IHS. Since their proposal, the D* \cite{Stentz94} algorithm, and later the D*~Lite \cite{KoenigLikhachev02} algorithms were considered the state of the art for this problem.  D* is a complex algorithm, and D*~Lite, while simpler, is still significantly more complicated than A*. 
+
+Recently, Multipath Generalized Adaptive A* (MPGAA*) \cite{HernandezAB15} was proposed as an alternative to D*. MPGAA* is an extension of Generalized Adaptive A* \cite{SunKY08} that, being based on A*, is simpler to understand and implement than D* and D* Lite. Moreover, MPGAA* was shown to outperform D* Lite over a wide range of benchmarks.
+
+A key feature of MPGAA* is that every action taken by the agent lies on an optimal path to the goal. MPGAA* guarantees this by running a consistency-reestablishing procedure---inherited from GAA*---each time it observes a change in the environment that could make the heuristic inconsistent. By ensuring that A* uses a consistent (and admissible) heuristic, only optimal paths to the goal are found.
+
+In this paper we show that the consistency-reestablishing module of MPGAA* is a source of significant overhead, and propose a remedy: Improved MPGAA*. Our motivation is problems in which agents have extended visibility ranges, that is, problems in which agents can observe changes in the environment that are relatively far away from their current position. Arguably, those situations are not too common in practice, but  the question of whether or not MPGAA* still can outperform the D* family of algorithms in such a setting is an interesting one. The question is more relevant given that recent evaluations \cite{AineL16} have shown that MPGAA* incurs severe overheads, due to heuristic updating, in some settings.
+
+What enables us to propose Improved MPGAA* is the interesting observation that neither consistency nor admissibility is actually needed to guarantee optimality, but rather a weaker condition. By realizing this, we propose a lazy heuristic update procedure that still guarantees that MPGAA* finds optimal paths. In our empirical evaluation, carried out over a number of benchmarks and visibility ranges, we show that Improved MPGAA* outperforms D* and D* Lite in the majority of the benchmarks, while the original version of MPGAA* usually could not.
+
+
+
+
+% \begin{itemize}
+% \item Planning on dynamic terrain is important.
+% \item D*/D*Lite dominant algorithm for grid, for several years
+% \item Recently A*-based MPGAA*, built on top of GAA* \cite{SunKY08}, found to be almost always better
+% \item Evaluation over limited visibility ranges
+% \item Recent evaluation (Sandip) showed great overheads when visibility ranges
+%   are increased
+% \item The consistency is the source of all problems
+% \item It turns out that consistency is not needed!
+% \item Improved MPGAA* exploits this fact
+% \item Details about the evaluation..
+% \end{itemize}
+
+
+\section{Background}
+A goal directed navigation problem is a tuple
+$P=(G,\gamma,\sstart,\sgoal)$, where $G=(V,E)$ is an undirected graph
+in which $V$ is a set of states and $E$ is a set of arcs, and where
+$\sstart$, the start state, and $\sgoal$, the goal state, are both in
+$V$, and where $\gamma=c_0c_1\ldots$ is an infinite sequence of cost
+functions, each of which maps each element in $E$ to a non-negative
+value in $\mathbb{R}\cup\{\infty\}$. Sequence $\gamma$ is used to
+model the fact that the terrain may change as the agent moves, and the
+cost value $\infty$ is used to represent the fact that states may, in
+practice, become disconnected from its neighbors in $G$.
+
+A \emph{path} over G is a
+sequence of states $s_0s_1\ldots s_n$ such that for all
+$i\in\{1,\ldots,n\}$, it holds that $(s_{i-1},s_i)\in E$. The
+\emph{cost of a path} $s_0\ldots s_n$ is 
+$\sum_{i=0}^{n-1} c_i(s_i,s_{i+1})$.
+% \footnote{Note that here we assume that the cost structure of the graph may
+% only change with an agent movement. This is a general assumption if we allow
+% no-ops, which can be modeled via zero-cost self-loops in $G$.} A path
+$\sigma=s_0\ldots s_n$ is a \emph{solution} to path-planning problem
+$P$ if $s_0=\sstart$, $s_n=\sgoal$, and the cost of $\sigma$ is
+finite.
+%Observe that even if there exists a path between \sstart and
+%\sgoal over $G$ it cannot be guaranteed that there exists a solution
+%to $P$, because this depends on $\gamma$.
+
+In real-world scenarios, agents have limited visibility and thus can only observe the cost of edges within their \emph{visibility range}. Formally, if the agent is at $s_i$, and its visibility range is $k$, then the arcs by which $c_i$ and $c_{i+1}$ may differ are only those reachable from $s_{i+1}$  via a path of length $k$ or less. 
+
+%Finally, given an infinite sequence of cost functions $\gamma=c_0c_1\ldots$, we associate the sequence of functions $\Delta=\delta_0\delta_1\ldots$, where $\delta_i(s,s')$ denotes the cost of a cost-optimal path from $s$ to $s'$ relative to cost function $c_i$, for every $i\geq 0$. In general, we use $\delta(s,s')$ to denote the cost of an optimal path between two states relative to a \emph{specific} cost function that should be clear from the context.
+
+%In the rest of the paper we focus on goal-directed navigation on \emph{grids}. As such, we assume the states of the search graph, $V$, are associated with $(x,y)$ coordinates, where both $x$ and $y$ range over intervals of naturals.  In 8-neighbor grids, a cell $(x,y)$ is connected to cells in the grid that are of the form $(x+d_x,y+d_y)$, with $d_x,d_y\in\{0,1,-1\}$ and $|d_x|+|d_y|\neq 0$.  A cell is an \emph{obstacle} under a cost function $c$ if all arcs leading to and emerging from it have cost equal to $\infty$. Below we also assume that the cost of the arc connecting two cells is either $\infty$ or the Euclidean distance between them.
+
+%The algorithms we describe below are based on heuristic search.
+%Given a graph $G=(V,E)$ and a goal state $\sgoal$, $h:V\rightarrow \mathbb{R}$ is such that
+A heuristic function $h_c$ is such that $h_c(s)$ is a non-negative estimate of the cost of a path from $s$ to $\sgoal$ under cost function $c$. We omit the subscript if the cost function is clear from the context. $h$ is \emph{admissible} iff for every state $s$, $h(s)$ does not overestimate the cost of any path from $s$ to $\sgoal$. $h$ is \emph{consistent} if for every $(s,t)\in E$ it holds that: \begin{equation}\label{eq:consistency}
+  h(s)\leq c(s,t)+h(t),
+\end{equation}
+and $h(\sgoal)=0$. Consistency implies admissibility. Finally, $h^*(s)$ is the cost of  an optimal path from $s$ to \sgoal.
+
+
+
+
+
+% \input related.tex
+
+\section{Multipath Generalized Adaptive A*}
+Multipath Generalized Adaptive A* (MPGAA*) is built on top of the A*-based algorithm, Generalized Adaptive A* \cite{SunKY08} (GAA*). Like GAA*, its objective is to move an agent to the goal state. In each iteration, it runs an A* search rooted in the current state towards the goal. Once a path is found, it updates the heuristic function and proceeds to move the agent following the path. Each time a step towards the goal is taken by the agent, the algorithm observes the environment and, if relevant changes are detected, it updates the heuristic (if needed), and then runs a complete new A* search towards the goal. The only difference between MPGAA* and GAA* is that the former will stop the A* search earlier,  potentially saving significant search time. MPGAA* stops an A* search when expanding a state $s$ if the following conditions hold: (1) $s$ is part of a path returned by a previous A* execution, and (2) it can be verified that the path connecting $s$ and the goal state is still optimal given the current knowledge of the agent.
+%Condition (2) can be checked efficiently by verifying that the heuristic function is perfect (i.e., equal to $h^*$) for every state in the existing path to the goal.
+
+Algorithm~\ref{mpgaa} shows a pseudocode of MPGAA*. Procedure \texttt{main} runs the main loop described above. There are a number of variables/properties that are used in the pseudocode, the most relevant of which we explain now.
+% A search state has a number of properties, some of which require some explanation: $g(s)$ and $h(s)$ are---as it is customary in A*---the cost of a path found to $s$ and the heuristic for $s$, respectively. In addition,
+Pointer $next(s)$ is set to null at initialization, and, as soon as a path $s_1s_2\ldots s_n$ is returned by an A* search, $next(s_i)$ is set to $s_{i+1}$ in the iteration of Line~\ref{ra:buildpath}. As usual in A*, a parent pointer for $s$, $parent(s)$ is used to keep track of which state was $s$ expanded from. Another relevant property, $search(s)$, is used to store the number of the search iteration at which $s$ was last expanded. Variable  $counter$ counts the number of iterations---this important variable is also used by procedure \texttt{InitializeSearch}, to set the $g$-value of an unexpanded state in the current iteration. Finally, variable $Q$ is a priority queue used by the procedure that updates the heuristic, a key part of the algorithm that we elaborate on now.
+
+% \paragraph{Updating the Heuristic is Important}
+Above we mentioned that $h$ is updated when running MPGAA*.
+The objective of such updates is twofold. First, updating the heuristic makes it more informed, which potentially saves time in a subsequent search. Second, the heuristics updates also aim at preserving the consistency of the heuristic, which has an important theoretical implication: it guarantees that any path computed by A* is \emph{optimal} with respect to the current knowledge of the agent \cite{SunKY08,HernandezAB15}.
+
+MPGAA* updates the heuristic function in two different sections of the code. First, right after an A* search returns, in Lines~\ref{aa:updatestart}--\ref{aa:updateend}. Intuitively this update aims at making $h$ more informed. %, since much of the discrepancies between actual and estimated costs can be backed up into $h$ using this update.
+The second section of the code that updates the heuristic the \texttt{Observe} procedure; specifically, in Lines~\ref{aa:const_call_begin}--\ref{aa:const_call_end}. Indeed, when an edge decreases its cost, there is potential for the heuristic to become inconsistent, as it may invalidate Inequality \eqref{eq:consistency}. Thus whenever an arc $(s,s')$ is observed to decrease its value, \texttt{Observe} adds state $s$ to the priority queue $Q$ and then invokes procedure \texttt{ReestablishConsistency}. This last procedure is a version of Dijkstra's algorithm: it extracts the state with least $h$-value from $Q$ and updates the $h$-value of its predecessors. The process repeats until $Q$ is empty. Upon termination, both updates guarantee that $h$ is consistent, for every state $s$ in the search graph \cite{SunKY08}.
+
+
+%Assuming that for 8-neighbor grids we initialize the heuristic with the octile distance, it is not hard to prove that the update of  Lines~\ref{aa:updatestart}--\ref{aa:updateend} may never decrease the heuristic function while preserving its consistency \cite{SunKY08}. In dynamic terrain, MPGAA* and GAA* require an additional update to preserve consistency. This is because, when a cost edge decreases,  
+
+\begin{algorithm}
+\fs{6}
+\DontPrintSemicolon
+\SetKwData{updaterule}{updaterule}
+\SetKwInOut{KwSideEffect}{Effect}
+
+\SetKwFunction{Astar}{A*}
+\SetKwFunction{BuildPath}{BuildPath}
+\SetKwFunction{Observe}{Observe}
+\SetKwFunction{InsertState}{InsertState}
+\SetKwFunction{GoalCondition}{GoalCondition}
+\SetKwFunction{InitializeState}{InitializeState}
+\SetKwData{Open}{\fs{6.5}Open}
+\SetKwData{Closed}{\fs{6.5}Closed}
+\SetKwData{Null}{\fs{6.5}null}
+\SetKwFunction{Lookahead}{LookAhead}
+\SetKwFunction{ExtractMinF}{Extract-Min-$f$}
+\SetKwFunction{ExtractMinH}{Extract-Min-$h$}
+\SetKwFunction{Insert}{InsertQ}
+\SetKwFunction{BestState}{Extract-Best-State}
+\SetKwFunction{Dijkstra}{ModifiedDijkstra}
+\SetKwFunction{Update}{ReestablishConsitency}
+\SetKwFunction{Main}{main}
+\SetKwData{back}{back}
+\SetKwFunction{Propagate}{Propagate}
+\SetKwFor{Proc}{procedure}{}{end}
+\SetKwFor{Func}{function}{}{end}
+\SetKwFor{Foreach}{for each}{do}{end}
+%\small
+  \Proc{\InitializeState{$s$}}{
+    \If{$\search(s) \neq \textit{\counter}$}{$g(s) \leftarrow \infty$\;}
+    $\search(s)\leftarrow \counter$\;
+  }
+\Proc{\Astar{$\sinit$}}{\label{ra:aabegin}
+  \InitializeState{$\sinit$}\;
+  $parent(\sinit)\leftarrow \Null$\;
+  $g(\sinit) \leftarrow 0$\;
+  $\Open \leftarrow \emptyset$\;
+  insert $\sinit$ into $\Open$ with f-value $g(\sinit) + h(\sinit)$\;
+  $\Closed \leftarrow \emptyset$\;
+  \While{$\Open \neq \emptyset$}{
+    remove a state $s$ from $\Open$ with the smallest f-value $g(s)+h(s)$\;
+    \If{\GoalCondition{$s$}}{
+      \Return $s$\;
+    }
+    insert $s$ into $\Closed$\;
+    \Foreach{$s' \in succ(s)$}{
+      \InitializeState{$s'$}\;	
+      \If{$g(s') > g(s)+c(s,s')$}{
+        $g(s') \leftarrow g(s) + c(s,s')$\;
+        $\parent(s') \leftarrow s$\;
+        \If{$s'$ is in $\Open$}{
+          set priority of $s'$ in \Open to $g(s') + h(s')$\;
+        }
+        \Else{
+          insert $s'$ into \Open with priority $g(s') + h(s')$\;
+        }
+      }
+    }
+  }
+  \Return{\Null}
+\label{ra:aaend}
+}
+
+
+\Func{\Observe{s}}{
+  $\Tinc\leftarrow \text{arcs in the range of visibility from $s$ whose
+    cost has increased}$\;
+  $\Tdec\leftarrow \text{arcs in the range of visibility from $s$ whose
+    cost has decreased}$\;
+  \Foreach{$(t,t') \in \Tinc\cup \Tdec$}{
+    $c(t,t') \leftarrow \text{new cost of $(t,t')$}$\;
+  }
+  \Foreach{$(t,t') \in \Tinc$}{
+    $next(t) \leftarrow \Null$ \label{aa:nn_one}
+  }
+  
+  \If{$\Tdec\neq \emptyset$}{ \label{aa:const_call_begin}
+    \Foreach{$(s,s')$ in \Tdec}{ \label{aa:addsates_begin}
+      \InsertState$(s,s',Q)$ \label{aa:addstates_end}
+    }
+    \Update() \tcp{not in Improved MPGAA*}\label{aa:const_call_end}
+  }
+  \Return{$\Tinc\cup \Tdec\neq \emptyset$}
+}
+
+  \Func{\GoalCondition($s$)}{
+   % \If{$s=s_{goal}$}{\Return{$true$}} 
+    \While{$next(s) \neq \textit{null}$ and $h(s) =
+      h(next(s)) + c(s,next(s))$}{
+      $s\leftarrow next(s)$
+    }
+    \Return{$s_{goal}=s$}
+  }
+\Proc{\InsertState{$s,s'$}}{
+  \If{$h(s)>c(s,s')+h(s')$ \label{obs:if}}{
+    $h(s) \leftarrow c(s,s') + h(s')$\; \label{obs:assignment}
+    $next(s)\leftarrow \Null$\;
+    $support(s)\leftarrow s'$\;
+    \If{$s$ in $Q$}{Update priority of $s$ in $Q$ to $h(s)$}
+    \Else{Insert $s$ into $Q$ with priority $h(s)$}
+  }
+}
+
+\Proc{\Update{}}{
+  \While{$Q$ is not empty}{
+    Extract state $s'$ with lowest $h$-value in $Q$\;
+    \Foreach{$s$ such that $s'\in Succ(s)$}{
+      \InsertState$(s,s',Q)$
+    }
+  }
+}
+
+
+\Proc{\Main{}}{
+$Q\leftarrow \text{empty priority queue}$\;
+$\counter \leftarrow 0$\;\label{ra:initstart}
+\Observe(\sstart)\;
+\Foreach{state $s \in S$}{ 
+  $\search(s) \leftarrow 0 $\;
+  $h(s) \leftarrow H(s,\sgoal)$\; \label{ra:init_heuristic}
+  $next(s) \leftarrow \Null$\; \label{ra:initend} \label{ra:nn_two}
+}
+% $h_{bound} \leftarrow h(\sstart)$\;
+\While{$\sstart \neq \sgoal$}{\label{ra:mainloopstart}
+  $\counter\leftarrow \counter+1$\;
+  $s\leftarrow \Astar{\sstart}$\; \label{ra:astarcall}
+  \If{$s= \Null$}{
+    \Return{``goal is not reachable''} \label{ra:notreachable}
+  }
+  \Foreach{$s' \in \Closed$\label{aa:updatestart}}{    
+    $h(s') \leftarrow g(s)+h(s) - g(s')$ \label{aa:updateend} 
+  }
+  \While{$s \neq \sstart$}{ \label{ra:buildpath}
+    $next(\parent(s))\leftarrow s$\;
+    % $t \leftarrow s$\;
+    $s \leftarrow \parent(s)$\;
+    % $next(s) \leftarrow t$\;
+  }
+  \Repeat{$\sstart=\sgoal$ or $\restart = \true$}{ \label{ra:repeatbegin}
+    $t \leftarrow \sstart$\;
+    $\sstart \leftarrow next(\sstart)$\;
+    $next(t) \leftarrow \Null$\;  \label{ra:nn_three} 
+%    $\counter \leftarrow \counter+1$\;
+    Move agent to \sstart\; \label{ra:movement}
+    $\restart \leftarrow \Observe{\sstart}$\; \label{ra:observe}
+    \label{ra:repeatend}
+  }
+\label{ra:mainloopend}}
+}
+\caption{MPGAA*}\label{alg:repeatedAstar}\label{mpgaa}
+\end{algorithm}
+
+
+
+\section{Improved MPGAA*}
+As mentioned above, MPGAA* is optimal because the heuristic function remains consistent and thus admissible, which allows A* to return an optimal path \cite{HartNR68}. However, below we elaborate on two observations that are key to obtaining an improved version of MPGAA*. First, we observe that re-establishing the consistency is a potentially very expensive procedure, requiring some times the expansion of a large portion of the search space. Second, we observe that admissibility of $h$ is not required to guarantee optimality of A* but, rather, a weaker condition. When put together, these two observations lead us to propose an intuitively less ambitious consistency maintenance algorithm which results in improved performance. 
+
+
+\begin{figure}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{ccc}
+    \includegraphics[bb=76 490 575 698,clip, width=0.3\columnwidth]{figs/wcase1.pdf} &
+    \includegraphics[bb=76 490 575 698,clip, width=0.3\columnwidth]{figs/wcase2.pdf} &
+    \includegraphics[bb=76 490 575 698,clip, width=0.3\columnwidth]{figs/wcase3.pdf} \\
+    
+  % \includegraphics[bb=76 375 460 696, clip, width=0.3\columnwidth]{figs/f1.pdf} &
+  % \includegraphics[bb=76 375 460 696, clip, width=0.3\columnwidth]{figs/f5.pdf} &
+  % \includegraphics[bb=76 375 460 696, clip, width=0.3\columnwidth]{figs/f2.pdf} \\
+    (a) & (b) &(c)
+  \end{tabular}
+\caption{MPGAA*'s expensive consistency maintainance. Numbers in the cells are $h$-values. The agent is represented by {\LARGE $\bullet$}, and the goal by {\large $\circ$}. Arrows show the $next$ pointer.}\label{fig:mpgaaexec}
+\end{figure}
+
+\begin{algorithm}
+\fs{6}
+\DontPrintSemicolon
+\SetKwData{updaterule}{updaterule}
+\SetKwInOut{KwSideEffect}{Effect}
+
+\SetKwFunction{Astar}{A*}
+\SetKwFunction{BuildPath}{BuildPath}
+\SetKwFunction{Observe}{Observe}
+\SetKwFunction{InsertState}{InsertState}
+\SetKwFunction{GoalCondition}{GoalCondition}
+\SetKwFunction{InitializeState}{InitializeState}
+\SetKwData{Open}{\fs{6.5}Open}
+\SetKwData{Closed}{\fs{6.5}Closed}
+\SetKwData{Null}{\fs{6.5}null}
+\SetKwFunction{Lookahead}{LookAhead}
+\SetKwFunction{ExtractMinF}{Extract-Min-$f$}
+\SetKwFunction{ExtractMinH}{Extract-Min-$h$}
+\SetKwFunction{Insert}{InsertQ}
+\SetKwFunction{BestState}{Extract-Best-State}
+\SetKwFunction{Dijkstra}{ModifiedDijkstra}
+\SetKwFunction{Update}{ReestablishConsitency}
+\SetKwFunction{Main}{main}
+\SetKwData{back}{back}
+\SetKwFunction{Propagate}{Propagate}
+\SetKwFor{Proc}{procedure}{}{end}
+\SetKwFor{Func}{function}{}{end}
+\SetKwFor{Foreach}{for each}{do}{end}
+%\small
+  \Proc{\InitializeState{$s$}}{
+    \If{$\search(s) \neq \textit{\counter}$}{$g(s) \leftarrow \infty$\;}
+    $\search(s)\leftarrow \counter$\;
+    $\Update(s)$
+  }
+
+ 
+  \Proc{\Update{$t$}}{
+  \While{$Q$ is not empty and $h(top(Q)) < h(t)$}{
+    Extract state $s'$ with lowest $h$-value in $Q$\;
+    \Foreach{$s$ such that $s'\in Succ(s)$}{
+      \InsertState$(s,s',Q)$
+    }
+  }
+}\caption{Improved MPGAA*}\label{alg:improved}
+\end{algorithm}
+\begin{figure}\centering
+  \includegraphics[bb=76 490 575 698,clip, width=0.3\columnwidth]{figs/wcase4.pdf}
+  \caption{Improved MPGAA*'s heuristic update on the gridworld of Figure~\ref{fig:mpgaaexec}. The heuristic is updated for three cells, regardless of the width of the grid.}\label{fig:impgaaexec}
+\end{figure}
+
+
+We observe first that consistency maintenance is an expensive procedure. We illustrate this with the 4-neighbor grid world of Figure~\ref{fig:mpgaaexec}. After finding a first path (shown in Figure~1b), the agent updates the heuristic function, moves to $C5$. Upon reaching $C5$, it discovers that $C7$ is no longer an obstacle (depicted in Figure~\ref{fig:mpgaaexec}b). Because some arcs have decreased their cost \texttt{ReestablishConsistency}---which henceforth we abbreviate as \texttt{RC}---is executed, which updates the heuristic of 8 cells, $B1$ and $C1..7$, resulting in the situation depicted by Figure~\ref{fig:mpgaaexec}c. Observe that, had we chosen a similar but wider grid, the number of cells expanded by \texttt{RC} would have grown with the size of the grid. In fact, the number of updated states is equal to the width of the grid. Worse even, after making several updates to the heuristics, those new $h$-values may play no role in future searches. In our example, observe that the next search expands \emph{only} one state: C5  (Figure~\ref{fig:mpgaaexec}c). Note also, that had our grid been wider, this second search would have expanded one cell too. 
+
+
+\begin{table*}%[htbp]
+  \centering
+  {\fs{7.5pt}
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular}{rrrrrrrrrrrrrrrr}
+    \toprule
+
+    \multicolumn{1}{c}{} & \multicolumn{5}{c}{Visibility 50}     & \multicolumn{5}{c}{Visibility 100}    & \multicolumn{5}{c}{Visibility 200} \\
+
+    \midrule
+
+    \multicolumn{1}{c}{Bucket} & \multicolumn{1}{c}{A*} & \multicolumn{1}{c}{D* Lite} & \multicolumn{1}{c}{iMPGAA*} & \multicolumn{1}{c}{iMPGAA*-B} & \multicolumn{1}{c}{Faster} & \multicolumn{1}{c}{A*} & \multicolumn{1}{c}{D* Lite} & \multicolumn{1}{c}{iMPGAA*} & \multicolumn{1}{c}{iMPGAA*-B} & \multicolumn{1}{c}{Faster} & \multicolumn{1}{c}{A*} & \multicolumn{1}{c}{D* Lite} & \multicolumn{1}{c}{iMPGAA*} & \multicolumn{1}{c}{iMPGAA*-B} & \multicolumn{1}{c}{Faster} \\
+
+    1     &        0.38  &        0.39  &         0.40  & \textbf{            0.36} & 72\%  & \textbf{       0.38} &     0.43  &         0.47  &             0.43  & 46\%  & \textbf{       0.38} &     0.44  &         0.59  &             0.57  & 13\% \\
+
+    2     &        1.34  &        1.26  &         1.32  & \textbf{            1.12} & 90\%  & \textbf{       1.35} &     1.39  &         1.50  &             1.36  & 75\%  & \textbf{       1.40} &     1.52  &         1.86  &             1.73  & 33\% \\
+
+    3     &        3.62  &        2.51  &         3.01  & \textbf{            2.30} & 87\%  &        3.85  &     2.73  &         3.60  & \textbf{            2.63 } & 76\%  &        4.13  & \textbf{    3.00} &         4.68  &             3.40  & 40\% \\
+
+    4     &        5.24  &        3.87  &         4.42  & \textbf{            3.46} & 89\%  &        6.13  &     4.20  &         5.52  & \textbf{            4.14} & 76\%  &        7.36  & \textbf{    4.80} &         8.07  &             5.57  & 49\% \\
+
+    5     &        9.85  &        5.55  &         6.57  & \textbf{            4.93} & 87\%  &     10.38  &     5.96  &         8.14  & \textbf{            5.72} & 78\%  &     12.50  & \textbf{    6.90} &       11.84  &             7.72  & 52\% \\
+
+    6     &     12.01  &        7.59  &         7.60  & \textbf{            6.58} & 88\%  &     14.04  &     8.18  &       10.23  & \textbf{            7.76} & 80\%  &     14.66  & \textbf{    9.37} &       13.94  &           10.01  & 56\% \\
+
+    7     &     16.81  &     10.31  &       10.00  & \textbf{            8.47} & 92\%  &     19.29  &   10.96  &       13.72  & \textbf{            9.77} & 84\%  &     22.61  & \textbf{  12.82} &       19.52  &           12.98  & 61\% \\
+
+    8     &     28.67  &     14.82  &       14.55  & \textbf{          12.13} & 93\%  &     30.09  &   15.77  &       17.88  & \textbf{          13.76} & 86\%  &     36.05  & 18.11 &       26.25  &           \textbf{  17.28}  & 70\% \\
+
+    9     &     45.88  &     22.42  &       19.74  & \textbf{          16.95} & 99\%  &     51.49  &   23.95  &       25.53  & \textbf{          18.61} & 96\%  &     60.95  &   27.44  &       37.10  & \textbf{          23.93} & 83\% \\ 
+
+    10    &   127.43  &     50.01  &       40.61  & \textbf{          34.35} & 99\%  &   140.60  &   51.09  &       52.43  & \textbf{          36.92} & 97\%  &   163.12  &   57.98  &       76.13  & \textbf{          45.66} & 86\% \\
+
+    \bottomrule
+
+    \end{tabular}%
+}
+\caption{Average runtime of algorithm variants. %Column ``Faster'' shows the
+                                %percentage of problems where iMPGAA*-B is
+                                %faster than D* Lite.
+}  \label{runtime}%
+
+\end{table*}%
+
+
+Our second observation is that it is not necessary to focus on re-establishing consistency of the heuristic. This is because neither consistency nor admissibility is required to guarantee A*'s optimality. Theorem~1 by \acite{HartNR68} states (slightly rephrased): ``if $h(s)\leq h^*(s)$, for every node $s$, then A* finds an optimal path''. Nevertheless, the requirement ``$h(s)\leq h^*(s)$, for every node $s$'' is not used in the proof but rather a weaker condition, namely that ``$h(s)\leq h^*(s)$, for every node $s$ that ever enters in the open list''. So with this observation in hand, we conclude that, to preserve optimality, we only need to guarantee that the $h$-value of each node entering Open does not overestimate the true cost to the goal. This is important because it means we can focus only on having $h$-values of  states relevant for the search.
+
+One more observation is needed to produce an improved, optimal MPGAA*. When executing \texttt{RC}, the $h$-values of states extracted from the priority queue $Q$ are non-decreasing. Despite this being an obvious remark, following from the fact that $Q$ is ordered by $h$, the important implication is that we can stop  \texttt{RC} sooner and run it only when needed. Indeed, assume that we observed changes in the environment, that we added these states to $Q$ (Lines~\ref{aa:addsates_begin}-\ref{aa:addstates_end}, Algorithm~\ref{mpgaa}) but that we do not run \texttt{RC} in Line \ref{aa:const_call_end}. Assume we now start searching for a new path using A* and that we are about to add $s$ to the open list. Here we would be at risk of generating a suboptimal path if $h(s)>h^*(s)$. If such were the case, running \texttt{RC} before adding $s$ to Open would result in setting the $h$-value of $s$ to a lower value. Thus, before adding $s$ to Open, assume we run \texttt{RC}. Assume further that eventually the $h$-value at the top of queue $Q$ is greater than $h(s)$. This means that $h(s)$ \emph{will not} decrease if we continue to run \texttt{RC}. We can therefore conclude that $h(s)\leq h^*(s)$, stop the update procedure, and resume search.
+
+
+
+Our improved version of MPGAA* replaces two procedures of the original MPGAA*, which are shown in Algorithm~\ref{alg:improved}, and removes  Line~\ref{aa:const_call_end} of Algorithm~\ref{mpgaa}. The rest of the code of MPGAA* remains without modification. The resulting algorithm, Improved MPGAA* is also optimal.
+
+\begin{theorem}[Optimality of Improved MPGAA*]\label{thm:optimalgaa}
+  If $h$ is initially consistent, the movement performed in
+  Line~\ref{ra:movement} lies on an optimal path to $\sgoal$ over
+  graph $G$ with respect to (current) cost function $c$.
+\end{theorem}
+% \begin{pfsketch}
+% Follows from the argument described above, and, in addition, the fact that  the condition used by MPGAA* to check optimality of a path found in a previous search is still correct even if the consistency update was stopped earlier.
+% \end{pfsketch}
+
+On the practical side, as a result of updating only those states that are needed, Improved MPGAA* may need to update substantially fewer states than MPGAA*. Figure~\ref{fig:impgaaexec} illustrates this for the example described earlier.
+
+\noindent
+\textbf{MPGAA*-B} Another improvement we propose comes from the observation that the first search can be done with backward A* (from the goal to the initial state). Afterwards we set $h(s)$ as the $g$-value of $s$ for each state expanded by A*, and resume normal execution of MPGAA*. Besides a more informed heuristic, doing this has the advantage that the backward search creates many paths to the goal state. We call this version MPGAA*-back or MPGAA*-B, for short.
+
+
+
+\section{Experimental Evaluation}
+
+% Table generated by Excel2LaTeX from sheet 'Tabla'
+
+
+% Table generated by Excel2LaTeX from sheet 'Tabla'
+
+% \begin{table}
+%   \centering
+%     \begin{tabular}{rrrrr}
+%     \toprule
+
+%           & \multicolumn{1}{c}{A*} & \multicolumn{1}{c}{D* Lite} & \multicolumn{1}{c}{iMPGAA*} & \multicolumn{1}{c}{iMPGAA*-B} \\
+
+%     \midrule
+
+%     Cost  &   579.68  &   579.71  &     579.68  &         580.77  \\
+
+%     Time  &     28.37  &     12.93  &       14.94  &           10.73  \\
+
+%     \bottomrule
+
+%     \end{tabular}%
+
+%       \caption{Cost and time, aggregated.}
+%   \label{aggregated}%
+
+%\end{table}%
+
+\begin{figure}\centering
+  \includegraphics[width=0.8\columnwidth]{plots/VisibilityExpansion.pdf}
+ \caption{Impact of our technique on expansions.}\label{fig:expansions}
+\end{figure}
+
+
+The objective of our evaluation was twofold. First, we wanted to investigate the impact of applying our technique over algorithms that use the \texttt{RC} procedure. Second, we wanted to compare with state-of-the-art algorithms. We focus the evaluation on pathfinding tasks in grid-like dynamic terrain. We use eight-neighbor grids with cardinal moves costing 1 and diagonal moves costing $\sqrt{2}$. The heuristic is the octile distance. All algorithms have a common code base and use a standard binary heap for Open and $Q$. Experiments were ran on a 2.60GHz Intel Core i7 under Linux.
+
+We used maps of $512\times 512$ scaled to $1024 \times 1024$ from the MovingAI repository \cite{sturtevant2012benchmarks}. Specifically, we used 4 room maps (Indoor), 4 World of Warcraft III maps (Outdoor) and 4 random maps.\footnote{8room\_000, 16room\_000, 32room\_000, 64room\_000, blastedlands, dragonfire, duskwood, gardenofwar, random512-10-0, random512-15-0, random512-20-0 and random512-25-0.} In each map we set an additional 5 percent of random obstacles. Like \acite{AineL16}, every 50 movements, 0.5\% randomly chosen unblocked cells become blocked and an equal number of the blocked cells are randomly chosen and set as unblocked. We evaluated 3 visibility range values: 50, 100, and 200. For each map we generated 250 random problems.
+ 
+Figure~\ref{fig:expansions} shows the impact of applying our technique over GAA*, MPGAA* and MPGAA*-B. We evaluate efficiency in terms of total expansions, which includes expansions during search and during updates (the figure also shows standard error bars). Our technique improves every algorithm and more significant improvements are observed for iMPGAA*-B over MPGAA*-B. As the the visibilty ranges increase improvements increase.  
+
+%The plot show that all i-versions improve the original algorithms.  The largest improvement is that of iMPGAA*-B over MPGAA*-B.   
+
+Table~\ref{runtime} compares repeated A* (i.e., A* with replanning), D* Lite, iMPGAA* and iMPGAA*-B. We analyzed the efficiency (in average runtime) depending on problem hardness, where we measure the hardness of problem as the runtime that D* Lite needs to solve them. We sort the problems according to hardness, allocating each problem in one of 10 buckets such that each bucket contains the same number of problems (bucket 10 thus contains the hardest problems). Additionally, we show the percentage of instances that iMPGAA*-B is faster than D* Lite in each Bucket. We observe  that (1) for small and medium visibility ranges, iMPGAA*-B is faster than D* Lite in all buckets, and (2) for the largest visibility range, D* Lite has a smaller runtime than iMPGAA*-B in some buckets. This may be explained by the fact that iMPGAA*-B needs to carry out more search (farther away from the current state) when the visibility range is larger.  Note that A* can be faster than the other algorithms for simple problems. Overall, we observe that iMPGAA*-B dominates D* Lite because it is faster in most of the problems evaluated. 
+ 
+Due to space, we do not include results per each benchmark, but iMPGAA*-B dominates in all. When aggregating results over visibility ranges we see that cost is similar for all algorithms and that iMPGAA*-B has the best runtime.   
+
+\section{Conclusions}
+We presented Improved MPGAA*, a variant of MPGAA* that does not maintain the heuristic consistent yet is still optimal. Our exprimental analysis confirms that our techniques improve the efficiency of algorithms that use the \texttt{RC} procedure, especially for larger visibility ranges.  iMPGAA*-B dominates all algorithms evaluated, including D*Lite. %Developing a bounded optimal and an anytime versions of iMPGAA*-B is part of our current and future work. 
+
+%{\small  
+
+\section*{Acknowledgements}
+We acknowledge support from Fondecyt via grants number 1150328 and number 1161526.
+
+\bibliography{ref}
+\bibliographystyle{aaai}
+%}
+
+\end{document}

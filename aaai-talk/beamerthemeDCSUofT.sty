@@ -1,0 +1,244 @@
+% \ProvidesPackageRCS $Header: /h/167/shirin/mycvs/cvsroot/ICAPS-W08/Talk/beamerthemeDCSUofT.sty,v 1.1 2008-09-08 14:33:53 jabaier Exp $
+
+
+\mode<presentation>
+
+\useinnertheme{rounded}
+\useoutertheme{default}
+\usecolortheme{whale}
+\usecolortheme{orchid}
+%\usecolortheme{seahorse}
+%\usecolortheme{rose}
+
+% squared items
+\setbeamertemplate{sections/subsections in toc}[square]
+\setbeamertemplate{items}[square]
+
+
+\definecolor{UofTBlue}{RGB}{0,47,101}
+%% \definecolor{UofTBlue}{RGB}{0,46,100}
+
+\setbeamercolor{structure}{fg=UofTBlue}
+\setbeamercolor{frametitle}{fg=white,bg=UofTBlue}
+
+%% \logo{\includegraphics[width=3cm]{compsci_655}}
+
+%% JB -- added following two lines
+\newsavebox{\smalluoftlogo}
+\sbox{\smalluoftlogo}{\includegraphics[width=.8cm]{puclogo-small.png}}
+\newsavebox{\smallucsclogo}
+\sbox{\smallucsclogo}{\includegraphics[width=.8cm]{unab.png}}
+
+%% \defbeamertemplate*{footline}{infolines theme}
+%% {
+%%   \leavevmode%
+%%   \hbox{%
+%%     \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{frametitle}%
+%%       \usebeamerfont{black}\insertshortauthor
+%%     \end{beamercolorbox}%
+%%     \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{frametitle}%
+%%       \usebeamerfont{black}\insertshorttitle
+%%     \end{beamercolorbox}%
+%%     \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{frametitle}%
+%%       \usebeamerfont{black}\insertshortdate{}\hspace*{2em}
+%%       \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+%%   \end{beamercolorbox}}%
+%%   \vskip0pt%
+%% }
+
+%% no navigation symbols:
+\setbeamertemplate{navigation symbols}{}
+
+\defbeamertemplate*{footline}{infolines theme}
+{
+  \leavevmode%
+  \hspace*{2ex}\usebox{\smallucsclogo}
+  \hfill
+  \hbox{%
+%%     \begin{beamercolorbox}[wd=.72\paperwidth,ht=2.25ex,dp=1ex,center]{frametitle}%
+    \begin{minipage}{.8\paperwidth}
+    \begin{beamercolorbox}[wd=.8\paperwidth,ht=0.3ex,dp=0ex]{frametitle}
+%%       \hspace*{2ex} \insertshortauthor: \insertshorttitle
+%%       \hfill \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox} %
+      \vspace*{0.3ex}
+      \hspace*{2ex} \insertshortauthor~(\insertshortinstitute): \insertshorttitle
+      \hfill \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+      \vspace*{0.3ex}\\
+      \end{minipage}}
+ \hfill
+  \usebox{\smalluoftlogo}\hspace*{2ex}
+%%   \vskip0pt%
+%%   \leavevmode
+%%   \hbox{
+%%     \insertshortauthor \insertshorttitle \insertframenumber{} / \inserttotalframenumber
+%%   }
+}
+
+\setbeamertemplate{title page} {
+
+  \begin{center}
+    \begin{beamerboxesrounded}[lower=frametitle,shadow=true]{}
+      \center
+      \inserttitle
+    \end{beamerboxesrounded}
+    \vspace*{0.3cm}
+    \insertauthor  \\[0.3cm]
+    {\scriptsize
+      \insertinstitute
+    %  Department of Computer Science\\
+    %  University of Toronto\\
+     % Toronto, Ontario, Canada
+    }
+
+  %\includegraphics[height=1.5cm]{unab.png} \hspace{2cm} \includegraphics[height=1.5cm]{puclogo-small.png}
+
+\vfill
+\begin{center}
+\includegraphics[width=.23\textwidth]{init.png} \hspace{2cm}
+\includegraphics[width=.23\textwidth]{goal.png}
+\end{center}
+\vfill
+   \insertdate
+  \end{center}
+
+}
+
+%% \setbeamertemplate{enumerate items}[square]
+
+
+%% ---------------------------------------------------------
+%% OLD, just for reference >>>
+
+
+
+%% %% \definecolor{colorsidebar}{RGB}{177, 150, 150}
+%% \definecolor{colorbackground}{RGB}{236, 209, 179}
+%% %% \definecolor{colorsidebar}{RGB}{206, 139, 109}
+
+%% %% \setbeamertemplate{background canvas}[vertical shading][bottom=colorbackground!80!black,middle=colorbackground,top=colorbackground,midpoint=0.05]
+%% \setbeamertemplate{background canvas}[vertical shading][bottom=colorbackground!50!white,middle=colorbackground,top=colorbackground,midpoint=0.05]
+%% % \setbeamercolor{background canvas}{bg=yellow!20!brown!30!white}
+%% % \setbeamertemplate{background canvas}[vertical shading][top=black!40!white,middle=red!40!white,bottom=yellow!40!white,midpoint=0.3]
+%% % \setbeamertemplate{background canvas}[vertical shading][bottom=black!10!white,top=black!50!white]
+
+
+%% \setbeamertemplate{blocks}[rounded][shadow=true]
+%% % \setbeamertemplate{blocks}[shadow=true]
+%% %% ^^^ CF: for some reason this causes problem under ubuntu (the rounded part)
+
+
+%% % /* ----------------------------------------------------------------------- */
+
+%% % \DeclareOptionBeamer{width}
+%% % {\PassOptionsToPackage{width=#1}{beamerouterthemesidebar}}
+
+%% % \DeclareOptionBeamer{hideothersubsections}
+%% % {\PassOptionsToPackage{hideothersubsections=#1}{beamerouterthemesidebar}}
+
+%% % \DeclareOptionBeamer{hideallsubsections}
+%% % {\PassOptionsToPackage{hideallsubsections=#1}{beamerouterthemesidebar}}
+
+%% % \ProcessOptionsBeamer
+
+
+
+%% \mode<presentation>
+
+%% % /* ----------------------------------------------------------------------- */
+%% % \useoutertheme[height=0pt,right]{sidebar}
+
+%% %% \useoutertheme{infolines}
+%% \setbeamercolor*{colorfootline}{fg=black}
+
+%% \defbeamertemplate*{footline}{infolines theme}
+%% {
+%%   \leavevmode%
+%%   \hbox{%
+%%   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{colorfootline}%
+%%     \usebeamerfont{colorfootline}\insertshortauthor
+%%   \end{beamercolorbox}%
+%%   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{colorfootline}%
+%%     \usebeamerfont{black}\insertshorttitle
+%%   \end{beamercolorbox}%
+%%   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{colorfootline}%
+%%     \usebeamerfont{black}\insertshortdate{}\hspace*{2em}
+%%     \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+%%   \end{beamercolorbox}}%
+%%   \vskip0pt%
+%% }
+%% % /* ----------------------------------------------------------------------- */
+
+
+%% % \usecolortheme{seahorse}
+%% % \setbeamercolor*{titlelike}{parent=structure}
+
+%% \setbeamertemplate{frametitle}[default][center]
+%% %% \setbeamercolor{frame body}{parent=normal text,use=block title,bg=colorbackground!50!white}
+
+%% % /* ----------------------------------------------------------------------- */
+
+%% \setbeamercolor{normal text}{fg=black,bg=black!40}
+%% %% \setbeamercolor{structure}{fg=colorsidebar}
+%% % \setbeamercolor{structure}{fg=colorbackground!40!black}
+%% \setbeamercolor{structure}{fg=red!40!black}
+%% % \setbeamerfont{structure}{size*=\fontsize{12}{1.0px}}
+%% \setbeamertemplate{sections/subsections in toc}[sections numbered]
+%% \setbeamerfont{section in toc}{size=\large,shape=\fontshape{bf}}
+
+
+%% \setbeamercolor{alerted text}{fg=red!85!black}
+%% %% \setbeamercolor{alerted text}{fg=blue}
+
+%% \setbeamercolor{item projected}{use=item,fg=black,bg=item.fg!75}
+
+%% \definecolor{beetle@other}{RGB}{64,80,127}
+
+%% \setbeamercolor*{palette primary}{fg=black,bg=beetle@other}
+%% \setbeamercolor*{palette secondary}{parent=palette primary,use=palette primary,bg=palette primary.bg!95!black}
+%% \setbeamercolor*{palette tertiary}{parent=palette primary,use=palette primary,bg=palette primary.bg!90!black}
+%% \setbeamercolor*{palette quaternary}{parent=palette primary,use=palette primary,bg=palette primary.bg!85!black}
+
+%% % \setbeamercolor*{palette sidebar}{bg=red!30!black}
+%% %% \setbeamercolor*{palette sidebar}{bg=colorsidebar}
+%% \setbeamercolor*{palette sidebar}{bg=colorbackground!80!black}
+%% \setbeamercolor*{sidebar}{parent=palette sidebar}
+
+%% \setbeamercolor*{palette sidebar primary}{fg=black}
+%% \setbeamercolor*{palette sidebar secondary}{fg=black!90!white}
+%% \setbeamercolor*{palette sidebar tertiary}{fg=black!80!white}
+%% \setbeamercolor*{palette sidebar quaternary}{fg=black!70!white}
+
+%% %% \setbeamercolor{frametitle}{fg=white,bg=colorsidebar}
+%% \setbeamercolor{frametitle}{fg=black,bg=colorbackground!80!black}
+%% \setbeamercolor{framesubtitle}{fg=black}
+
+%% \setbeamercolor*{subtitle}{fg=black}
+
+%% % -- from orchid color theme
+%% %% \setbeamercolor{block title}{use=structure,fg=white,bg=structure.fg!75!black}
+%% \setbeamercolor{block title}{fg=black,bg=colorbackground!80!black}
+%% \setbeamercolor{block title alerted}{use=alerted text,fg=black,bg=alerted text.fg!75!black}
+%% \setbeamercolor{block title example}{use=example text,fg=white,bg=example text.fg!75!black}
+
+%% % \setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!10!bg}
+%% \setbeamercolor{block body}{fg=black,bg=colorbackground!70!white}
+%% \setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!10!bg}
+%% \setbeamercolor{block body example}{parent=normal text,use=block title example,bg=colorbackground!20!white}
+
+
+%% \setbeamertemplate{navigation symbols}{
+%%   \insertslidenavigationsymbol
+%%   \insertframenavigationsymbol
+%%   \insertbackfindforwardnavigationsymbol
+%% }
+%% \setbeamercolor{navigation symbols}{fg=black,bg=black}
+
+
+%% %% \usefonttheme[onlymath]{serif}
+
+%% \setbeamercovered{opaque}
+%% % \setbeamercovered{transparent=10}
+
+\mode
+<all>

@@ -1,0 +1,104 @@
+%\documentclass[mathserif]{beamer}
+\documentclass{beamer}
+
+%\usepackage[noend]{algpseudocode}
+%\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+%\usepackage[spanish]{babel}
+%\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{multimedia}
+\newcommand{\dashlinestretch}{0}
+%\usepackage{pictex}
+
+
+\input{defs.tex}
+\input{dvipsnam.def} %input color definitions
+\usetheme{DCSUofT}
+%\usecolortheme[named=LimeGreen]{structure}
+%\usecolortheme[named=yellow]{structure}
+%\usecolortheme[cmyk={0.64,0,0.95,0.40}]{structure}
+%\usecolortheme{albatross}
+
+\newcommand{\lsquish}{\vspace{-6pt}}
+\newcommand{\CITE}[1]{\cite{#1}}
+
+
+\def\BBAB{\&} % make inline citations consistent with the use of and in parenthesis
+%\input{defs}
+%\input{master_macros}
+
+
+%\DeclareGraphicsRule{.pdftex}{pdf}{*}{}
+
+\beamertemplatenavigationsymbolsempty
+
+
+\title[Solving Sum-of-Costs MAPF with ASP]{Solving Sum-of-Costs Multi-Agent Pathfinding with \\ Answer-Set Programming}
+
+\author[Gómez, Hernández,  Baier]{Rodrigo N. Gómez\inst{1} ~~~ Carlos Hernández\inst{2} ~~~ Jorge  A.\ Baier\inst{1,3}}
+
+\institute[PUC/UNAB/IMFD Chile]{
+\inst{1}
+ Depto.\ de Ciencia de la Computación, PUC Chile\\
+ \inst{2}
+ Depto.\ de Ciencias  de la Ingenier\'ia, UNAB Chile\\
+ \inst{3}
+  Millennium Institute  for Foundational Research on Data, Chile
+}
+
+\date{AAAI-2020}
+
+%%%% The outline definition
+
+\begin{document}
+\begin{frame}{}
+\titlepage
+\thispagestyle{empty}
+\end{frame}
+
+\begin{frame}{Multi-Agent Pathfinding via ASP}
+
+  \hspace{-3em}\begin{tabular}{cc}
+  \begin{minipage}{.7\textwidth}\small
+\begin{itemize}
+\item First encoding of sum-of-costs MAPF to ASP
+\item \textbf{Great}: in highly congested maps:
+\begin{itemize}
+  \item we outperform:
+  \begin{itemize}
+    \item SAT-based solvers
+    \item heuristic-search-based solvers
+  \end{itemize}
+\end{itemize}
+\item \textbf{Key}: a \textbf{linear} encoding for conflicts
+\item \textbf{Interesting}: encoding of the optimization
+\item \textbf{Unglamorous:}
+\begin{itemize}
+  \item outperformed on ``easy" problems
+  \item does not scale to large maps
+\end{itemize}
+%\item Our approach does not scale to large maps, and does not outperform heuristic-search solvers when the number of agents is small.
+\end{itemize}
+\end{minipage} &
+\begin{minipage}{.3\textwidth}
+  \includegraphics[width=0.95\textwidth]{20x20_obs_succ_new.pdf} \hspace{.8in}
+   \includegraphics[width=1.3\textwidth]{20x20_obs_runtime_new.pdf}
+\end{minipage}
+
+\end{tabular}
+\end{frame}
+
+\end{document}
+
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
